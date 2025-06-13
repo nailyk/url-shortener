@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS urls (
+  id SERIAL PRIMARY KEY,
+  alias VARCHAR(20) UNIQUE NOT NULL,
+  original_url TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  expires_at TIMESTAMP
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_urls_alias ON urls(alias);
