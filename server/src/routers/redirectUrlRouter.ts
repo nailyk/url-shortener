@@ -1,9 +1,9 @@
 import { Router } from "express";
 import urlService from "../services/urlService.js";
 
-const redirectRouter = Router();
+const router = Router();
 
-redirectRouter.get("/:code", async (req, res, next) => {
+router.get("/:code", async (req, res, next) => {
   try {
     const url = await urlService.resolveShortUrl(req.params.code);
     res.redirect(url);
@@ -12,4 +12,4 @@ redirectRouter.get("/:code", async (req, res, next) => {
   }
 });
 
-export default redirectRouter;
+export default router;

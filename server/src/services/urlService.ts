@@ -51,7 +51,7 @@ async function createShortUrl(
   return alias;
 }
 
-async function resolveShortUrl(alias: string) {
+async function resolveShortUrl(alias: string): Promise<string> {
   // Try cache first
   let url = await redisClient.getCachedUrl(alias);
   if (url) return url;

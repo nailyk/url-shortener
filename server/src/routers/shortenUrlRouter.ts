@@ -1,13 +1,13 @@
 import { Router, Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
-import { shortenRequestValidator } from "../validators/shortenRequestValidator.js";
+import { shortenUrlRequestValidator } from "../validators/shortenUrlRequestValidator.js";
 import urlService from "../services/urlService.js";
 
-const apiRouter = Router();
+const router = Router();
 
-apiRouter.post(
+router.post(
   "/shorten",
-  shortenRequestValidator,
+  shortenUrlRequestValidator,
   async (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -24,4 +24,4 @@ apiRouter.post(
   },
 );
 
-export default apiRouter;
+export default router;

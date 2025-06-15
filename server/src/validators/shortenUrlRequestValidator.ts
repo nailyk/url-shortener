@@ -1,7 +1,7 @@
 import { body } from "express-validator";
 import ms from "ms";
 
-export const shortenRequestValidator = [
+export const shortenUrlRequestValidator = [
   body("url")
     .exists()
     .withMessage("url field is required")

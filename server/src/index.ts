@@ -1,8 +1,8 @@
 import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
-import shortenController from "./controllers/shortenController.js";
-import redirectController from "./controllers/redirectController.js";
+import shortenUrlRouter from "./routers/shortenUrlRouter.js";
+import redirectUrlRouter from "./routers/redirectUrlRouter.js";
 import errorHandler from "./middlewares/errorHandler.js";
 
 const app = express();
@@ -18,8 +18,8 @@ app.use(
 
 app.use(bodyParser.json());
 
-app.use("/api", shortenController);
-app.use("/", redirectController);
+app.use("/api", shortenUrlRouter);
+app.use("/", redirectUrlRouter);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
