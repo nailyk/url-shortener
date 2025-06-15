@@ -21,11 +21,7 @@ async function isAliasExists(alias: string) {
   return res.rows.length > 0;
 }
 
-async function saveUrl(
-  alias: string,
-  originalUrl: string,
-  expiresAt: Date | null,
-) {
+async function saveUrl(alias: string, originalUrl: string, expiresAt?: Date) {
   await pool.query(
     "INSERT INTO urls (alias, original_url, expires_at) VALUES ($1, $2, $3)",
     [alias, originalUrl, expiresAt],

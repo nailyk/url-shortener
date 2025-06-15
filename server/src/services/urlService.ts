@@ -14,8 +14,8 @@ const sqids = new Sqids({ minLength: 6 });
 async function createShortUrl(
   originalUrl: string,
   customAlias?: string,
-  expiresIn?: StringValue,
-) {
+  expiresIn?: ms.StringValue,
+): Promise<string> {
   if (customAlias && (await postgresClient.isAliasExists(customAlias))) {
     throw new AliasAlreadyExistsError(customAlias);
   }
@@ -31,9 +31,10 @@ async function createShortUrl(
     alias = sqids.encode([nextShortCode]);
   }
 
-  const expiresInMs = expiresIn ? ms(expiresIn) : null;
-  const expiresAt = expiresInMs ? new Date(Date.now() + expiresInMs) : null;
-
+  const expiresInMs = expiresIn ? ms(expiresIn) : undefined;
+  const expiresAt = expiresInMs
+    ? new Date(Date.now() + expiresInMs)
+    : undefined;
   await postgresClient.saveUrl(alias, originalUrl, expiresAt);
 
   try {

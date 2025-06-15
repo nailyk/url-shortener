@@ -5,7 +5,12 @@
     "rootDir": "./",
     "types": ["vitest"]
   },
-  "include": ["src/**/*.ts", "tests/**/*.test.ts"],
+  "include": [
+    "src/**/*.ts",
+    "tests/**/*.test.ts",
+    "tests/routers/redirectUrlRouter.test.ts",
+    "tests/routers/redirectUrlRouter.test.ts"
+  ],
   "exclude": ["build"],
   "allowImportingTsExtensions": true
 }

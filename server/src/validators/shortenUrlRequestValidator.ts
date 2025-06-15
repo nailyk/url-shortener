@@ -21,6 +21,6 @@ export const shortenUrlRequestValidator = [
     .optional()
     .custom((value) => ms(value))
     .withMessage(
-      'Invalid duration format. Use something like "5m", "2h", "1d", etc."',
+      'Invalid duration format. Use something like "5m", "2h", "1d", etc...',
     ),
 ];
