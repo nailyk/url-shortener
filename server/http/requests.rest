@@ -1,0 +1,20 @@
+### Create with alias
+POST http://localhost:3000/urls
+Content-Type: application/json
+
+{
+  "url": "https://openai.com/tule",
+  "expiresIn": "12 days",
+  "alias": "aff"
+}
+
+### Create without alias
+POST http://localhost:3000/urls
+Content-Type: application/json
+
+{
+  "url": "https://github.com"
+}
+
+### Redirect
+GET http://localhost:3000/openai

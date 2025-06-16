@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS url_mappings (
+    id SERIAL PRIMARY KEY,
+    original_url TEXT NOT NULL,
+    alias VARCHAR(20) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP
+);
