@@ -2,11 +2,8 @@
   "extends": "@tsconfig/node22/tsconfig.json",
   "compilerOptions": {
     "outDir": "./build",
-    "rootDirs": ["./", "../shared"],
-    "types": ["vitest"],
-    "paths": {
-      "@shared/*": ["../shared/*"]
-    }
+    "rootDir": "./",
+    "types": ["vitest"]
   },
   "include": ["src/**/*.ts", "tests/**/*.test.ts"],
   "exclude": ["build"]

@@ -1,0 +1,13 @@
+{
+  "name": "@url-shortener/shared-types",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.2",
+    "@types/ms": "^2.1.0",
+    "express-validator": "^7.2.1",
+    "typescript": "^5.8.3"
+  }
+}

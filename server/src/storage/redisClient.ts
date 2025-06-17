@@ -1,4 +1,4 @@
-import { Alias, OriginalUrl } from "@shared/types.js";
+import { Alias, OriginalUrl } from "@url-shortener/shared-types";
 import { Redis as RedisClient } from "ioredis";
 
 let redis: RedisClient | null = null;

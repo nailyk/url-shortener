@@ -40,13 +40,13 @@ describe("GET /:alias", () => {
 
   it("should respond with 404 if urlService throws an error", async () => {
     mockedUrlService.resolveOriginalUrl.mockRejectedValue(
-      new AliasDoesNotExistError(),
+      new AliasDoesNotExistError("toto"),
     );
 
     const res = await getRedirect("/toto");
 
     expect(res.status).toBe(404);
-    expect(res.body.error).toBe("Alias does not exist");
+    expect(res.body.error).toBe('Alias "toto" does not exist');
     expect(mockedUrlService.resolveOriginalUrl).toHaveBeenCalledWith("toto");
   });
 });

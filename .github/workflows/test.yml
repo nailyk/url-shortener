@@ -3,7 +3,7 @@ name: Run Tests
 on:
   push:
     branches:
-      - "**" # run on all branches
+      - "**"
   pull_request:
     branches:
       - "**"
@@ -12,31 +12,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:17
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: url_shortener
-        options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
-      redis:
-        image: redis:7-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd="redis-cli ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -44,10 +19,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install server dependencies
         run: npm --prefix server install
 
       - name: Run tests
         run: npm run test
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true

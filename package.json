@@ -3,20 +3,23 @@
     "docker:deps:start": "docker-compose up -d redis postgres",
     "docker:deps:stop": "docker-compose down -v",
     "dev:client": "npm --prefix client run dev",
-    "dev:server": "npm run docker:deps:start && npm --prefix server run dev",
-    "dev:full": "npm run docker:deps:start && concurrently \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "dev:server": "npm --prefix server run dev",
+    "dev": "npm run docker:deps:start && concurrently \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
     "test": "npm --prefix server run test",
     "test:e2e": "npm run test --prefix playwright",
     "test:e2e:ui": "npm run test:ui --prefix playwright",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "clean:db": "docker-compose stop postgres && docker-compose rm -f postgres && docker volume rm url-shortener_postgres-data"
   },
   "devDependencies": {
-    "@types/ms": "^2.1.0",
     "concurrently": "^9.1.2",
-    "express-validator": "^7.2.1",
     "husky": "^9.1.7",
+    "lint-staged": "^16.1.2",
     "prettier": "^3.5.3"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx,css,json,md}": "prettier --write"
   }
 }

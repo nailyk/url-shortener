@@ -1,4 +1,4 @@
-import { Alias } from "@shared/types.js";
+import { Alias } from "@url-shortener/shared-types";
 
 class CustomError extends Error {
   public status: number;
@@ -17,13 +17,13 @@ export class AliasAlreadyExistsError extends CustomError {
 }
 
 export class AliasIsExpiredError extends CustomError {
-  constructor() {
-    super("AliasIsExpiredError", "Alias is expired", 404);
+  constructor(alias: Alias) {
+    super("AliasIsExpiredError", `Alias "${alias}" is expired`, 404);
   }
 }
 
 export class AliasDoesNotExistError extends CustomError {
-  constructor() {
-    super("AliasDoesNotExistError", "Alias does not exist", 404);
+  constructor(alias: Alias) {
+    super("AliasDoesNotExistError", `Alias "${alias}" does not exist`, 404);
   }
 }

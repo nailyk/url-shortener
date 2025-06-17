@@ -2,7 +2,7 @@ import express, { Router, Request, Response, NextFunction } from "express";
 import {
   ShortenUrlRequestBody,
   ShortenUrlResponseBody,
-} from "@shared/types.js";
+} from "@url-shortener/shared-types";
 import { shortenUrlRequestValidators } from "../middlewares/shortenUrlRequestValidators.js";
 import urlService from "../services/urlService.js";
 import { validateRequestHandler } from "../middlewares/validateRequestHandler.js";

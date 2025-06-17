@@ -8,7 +8,7 @@ import {
   AliasIsExpiredError,
   AliasDoesNotExistError,
 } from "../errors/errors.js";
-import { Alias, OriginalUrl } from "@shared/types.js";
+import { Alias, OriginalUrl } from "@url-shortener/shared-types";
 
 // TODO create service which can be easily unit tested
 
@@ -49,11 +49,11 @@ async function resolveOriginalUrl(alias: Alias): Promise<OriginalUrl> {
   if (originalUrl) return originalUrl;
 
   const data = await postgresClient.getOriginalUrlByAlias(alias);
-  if (!data) throw new AliasDoesNotExistError();
+  if (!data) throw new AliasDoesNotExistError(alias);
 
   const { original_url, expires_at } = data;
   if (expires_at && new Date() > new Date(expires_at))
-    throw new AliasIsExpiredError();
+    throw new AliasIsExpiredError(alias);
 
   const ttl = expires_at
     ? Math.floor((new Date(expires_at).getTime() - Date.now()) / 1000)

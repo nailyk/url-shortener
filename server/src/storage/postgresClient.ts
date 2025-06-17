@@ -1,4 +1,4 @@
-import { Alias, OriginalUrl } from "@shared/types.js";
+import { Alias, OriginalUrl } from "@url-shortener/shared-types";
 import { Pool } from "pg";
 
 let pool: Pool | null = null;
