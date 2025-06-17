@@ -4,6 +4,7 @@ export default defineConfig({
   testDir: "./tests",
   use: {
     baseURL: "http://localhost:5174",
-    screenshot: "only-on-failure",
+    screenshot: "on",
+    video: "on",
   },
 });
