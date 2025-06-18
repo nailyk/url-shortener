@@ -22,7 +22,9 @@ Supports custom aliases + expiration time
 ```
 url-shortener/
 ├── client/         # React frontend (Vite)
-├── server/         # Express backend
+├── server/         # Express/NodeJs backend
+├── shared-types/   # types shared between client/server
+├── playwright/     # e2e tests
 ├── docker-compose.yml
 ```
 
@@ -46,13 +48,13 @@ cd url-shortener
 
 ---
 
-### 2. Start the application locally
+### 2. Run the application locally
 
 ```sh
-npm run dev
+npm install && npm run dev
 ```
 
-- Frontend: [http://localhost:8080](http://localhost:8080)
+- Frontend: [http://localhost:5173](http://localhost:5173)
 - Backend/API: [http://localhost:3000](http://localhost:3000)
 
 ---

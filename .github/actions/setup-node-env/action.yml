@@ -1,0 +1,15 @@
+name: Setup Node.js Environment
+description: Common setup steps
+runs:
+  using: "composite"
+  steps:
+    - name: 🧰 Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version-file: ".nvmrc"
+        cache: "npm"
+        cache-dependency-path: package-lock.json
+
+    - name: 📦 Install app
+      run: npm ci
+      shell: bash
