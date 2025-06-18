@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe("URL Shortener E2E", () => {
   test("should create a short URL and show it", async ({ page }) => {
-    await page.goto("http://localhost:5173");
+    await page.goto("/");
 
     const customAlias = generateRandomAlias();
     // Fill the form

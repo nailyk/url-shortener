@@ -13,6 +13,7 @@ app.use(cors());
 
 app.use("/api/shorten", shortenUrlRouter);
 app.use("/", redirectUrlRouter);
+
 app.use(errorHandler);
 
 app.listen(process.env.PORT, () => {
