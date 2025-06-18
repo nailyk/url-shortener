@@ -1,10 +1,6 @@
 {
   "scripts": {
-    "docker:deps:start": "docker-compose up -d redis postgres",
-    "docker:deps:stop": "docker-compose down -v",
-    "dev:client": "npm --prefix client run dev",
-    "dev:server": "npm --prefix server run dev",
-    "dev": "npm run docker:deps:start && concurrently \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "dev": "docker-compose up -d redis postgres && concurrently \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
     "test": "npm --prefix server run test",
     "test:e2e": "npm run test --prefix playwright",
     "test:e2e:ui": "npm run test:ui --prefix playwright",

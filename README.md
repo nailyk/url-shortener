@@ -1,7 +1,7 @@
 # URL Shortener
 
-A full-stack URL shortener application built with React (frontend), Express (backend), PostgreSQL, and Redis.  
-Supports custom aliases, expiration (analytics TBA)
+A full-stack URL shortener built with React, Express/Node.js, PostgreSQL, and Redis — all in TypeScript.
+Supports custom aliases + expiration time
 
 ---
 
@@ -40,17 +40,16 @@ url-shortener/
 ### 1. Clone the repository
 
 ```sh
-git clone https://github.com/yourusername/url-shortener.git
+git clone https://github.com/nailyk/url-shortener.git
 cd url-shortener
 ```
 
 ---
 
-### 2. Start with Docker Compose
+### 2. Start the application locally
 
 ```sh
-docker-compose build
-docker-compose up
+npm run dev
 ```
 
 - Frontend: [http://localhost:8080](http://localhost:8080)
@@ -58,24 +57,11 @@ docker-compose up
 
 ---
 
-## Database
+## Informations
 
 - PostgreSQL is used for persistent storage.
 - Redis is used for caching and short code generation (using REDIS INCR coupled with sqid)
 - Database schema is initialized from `server/src/config/db-init.sql`.
-
----
-
-## Useful Commands
-
-- **Reset database (Docker Compose):**
-  ```sh
-  docker-compose down -v
-  ```
-- **Rebuild images:**
-  ```sh
-  docker-compose build
-  ```
 
 ---
 
