@@ -16,7 +16,7 @@ function initPool() {
 
   return pool;
 }
-async function getOriginalUrlByAlias(alias: Alias) {
+async function getOriginalUrl(alias: Alias) {
   const res = await initPool().query(
     "SELECT original_url, expires_at FROM url_mappings WHERE alias = $1",
     [alias],
@@ -47,7 +47,7 @@ async function saveUrl(
 }
 
 export default {
-  getOriginalUrlByAlias,
+  getOriginalUrl,
   doesAliasExist,
   saveUrl,
 };

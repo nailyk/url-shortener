@@ -48,7 +48,7 @@ async function resolveOriginalUrl(alias: Alias): Promise<OriginalUrl> {
   let originalUrl = await redisClient.getOriginalUrl(alias);
   if (originalUrl) return originalUrl;
 
-  const data = await postgresClient.getOriginalUrlByAlias(alias);
+  const data = await postgresClient.getOriginalUrl(alias);
   if (!data) throw new AliasDoesNotExistError(alias);
 
   const { original_url, expires_at } = data;

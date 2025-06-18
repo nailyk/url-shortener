@@ -62,7 +62,7 @@ docker-compose up
 
 - PostgreSQL is used for persistent storage.
 - Redis is used for caching and short code generation (using REDIS INCR coupled with sqid)
-- Database schema is initialized from `server/src/db/init.sql`.
+- Database schema is initialized from `server/src/config/db-init.sql`.
 
 ---
 

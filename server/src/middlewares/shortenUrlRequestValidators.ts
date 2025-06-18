@@ -1,26 +1,37 @@
-import { body } from "express-validator";
+import { checkSchema } from "express-validator";
 import ms from "ms";
 
-export const shortenUrlRequestValidators = [
-  body("url")
-    .exists()
-    .withMessage("url field is required")
-    .bail()
-    .isURL()
-    .withMessage("Invalid URL")
-    .trim(),
+export const shortenUrlRequestValidators = checkSchema({
+  url: {
+    in: ["body"],
+    exists: {
+      errorMessage: "url field is required",
+    },
+    isURL: {
+      errorMessage: "Invalid URL",
+    },
+    trim: true,
+  },
 
-  body("customAlias")
-    .optional()
-    .isAlphanumeric()
-    .withMessage("Alias must be alphanumeric")
-    .isLength({ max: 20 })
-    .withMessage("Alias must be at most 20 characters long"),
+  customAlias: {
+    in: ["body"],
+    optional: true,
+    isAlphanumeric: {
+      errorMessage: "Alias must be alphanumeric",
+    },
+    isLength: {
+      options: { max: 20 },
+      errorMessage: "Alias must be at most 20 characters long",
+    },
+  },
 
-  body("expiresIn")
-    .optional()
-    .custom((value) => ms(value))
-    .withMessage(
-      'Invalid duration format. Use something like "5m", "2h", "1d", etc...',
-    ),
-];
+  expiresIn: {
+    in: ["body"],
+    optional: true,
+    custom: {
+      options: (value) => !!ms(value),
+      errorMessage:
+        'Invalid duration format. Use something like "5m", "2h", "1d", etc...',
+    },
+  },
+});
