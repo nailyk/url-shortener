@@ -1,5 +1,6 @@
 services:
   server:
+    container_name: server
     build:
       context: .
       dockerfile: ./server/Dockerfile
@@ -10,8 +11,14 @@ services:
     depends_on:
       - postgres
       - redis
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z localhost 3000 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   client:
+    container_name: client
     build:
       context: ./client
     ports:
@@ -20,15 +27,27 @@ services:
       - ./client/.env
     depends_on:
       - server
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z localhost 80 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   redis:
+    container_name: redis
     image: redis:7-alpine
     ports:
       - "6379:6379"
     volumes:
       - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   postgres:
+    container_name: postgres
     image: postgres:17-alpine
     ports:
       - "5432:5432"
@@ -39,6 +58,11 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./server/src/config/db-init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
 volumes:
   redis-data:

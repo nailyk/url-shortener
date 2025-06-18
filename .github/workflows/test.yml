@@ -1,32 +1,105 @@
-name: Run Tests
+name: 🧪 PR Tests
 
 on:
-  push:
-    branches:
-      - "**"
   pull_request:
     branches:
       - "**"
 
 jobs:
-  test:
+  unit-tests:
+    name: 🧪 Unit Tests
+    timeout-minutes: 5
     runs-on: ubuntu-latest
 
+    concurrency:
+      group: unit-${{ github.head_ref }}
+      cancel-in-progress: true
+
     steps:
-      - name: Checkout repository
+      - name: 🔄 Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: 🧰 Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version-file: ".nvmrc"
+          cache: "npm"
+          cache-dependency-path: server/package-lock.json
 
-      - name: Install server dependencies
+      - name: 📦 Install server dependencies
         run: npm --prefix server install
 
-      - name: Run tests
+      - name: 🧪 Run unit tests
         run: npm run test
 
-concurrency:
-  group: test-${{ github.ref }}
-  cancel-in-progress: true
+  e2e-tests:
+    name: 🚀 End-to-End Tests
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    needs: unit-tests
+
+    concurrency:
+      group: e2e-${{ github.head_ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: 🔄 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🧰 Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+          cache-dependency-path: |
+            server/package-lock.json
+            client/package-lock.json
+            shared-types/package-lock.json
+            playwright/package-lock.json
+
+      - name: 🐳 Build and start Docker services
+        run: docker compose up -d --build
+
+      - name: 🕐 Wait for Docker healthchecks
+        run: |
+          for service in redis postgres server client; do
+            echo "Waiting for $service to be healthy..."
+            timeout 120 bash -c "until [ \"\$(docker inspect -f '{{.State.Health.Status}}' $service 2>/dev/null)\" = \"healthy\" ]; do echo 'Still waiting for $service...'; sleep 2; done"
+            echo "$service is healthy!"
+          done
+
+      - name: 📦 Install dependencies
+        run: |
+          for dir in shared-types server client playwright; do
+            echo "Installing in $dir..."
+            npm ci --prefix "$dir"
+          done
+
+      - name: 💾 Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      - name: 🌐 Install Playwright Chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: 🎭 Run Playwright E2E tests
+        env:
+          BASE_URL: http://localhost:8080
+        run: npm run test:e2e
+
+      - name: 📤 Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright/test-results
+
+      - name: 🧹 Tear down Docker services
+        if: always()
+        run: docker compose down
