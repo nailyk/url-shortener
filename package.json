@@ -1,13 +1,13 @@
 {
   "scripts": {
-    "dev": "docker-compose up -d redis postgres && concurrently \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
-    "test": "npm --prefix server run test",
-    "test:e2e": "npm run test --prefix playwright",
-    "test:e2e:ui": "npm run test:ui --prefix playwright",
+    "dev": "docker-compose up -d redis postgres && concurrently \"npm run dev --workspace server\" \"npm run dev --workspace client\"",
+    "test": "npm run test --workspace server",
+    "test:e2e": "npm run test --workspace playwright",
+    "test:e2e:ui": "npm run test:ui --workspace playwright",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky install",
-    "clean:db": "docker-compose stop postgres && docker-compose rm -f postgres && docker volume rm url-shortener_postgres-data"
+    "clean": "rm -rf node_modules package-lock.json **/node_modules **/package-lock.json"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
@@ -16,6 +16,13 @@
     "prettier": "^3.5.3"
   },
   "lint-staged": {
-    "*.{js,ts,tsx,css,json,md}": "prettier --write"
-  }
+    "*.{js,ts,tsx,css,json,mdn,yml}": "prettier --write"
+  },
+  "workspaces": [
+    "server",
+    "client",
+    "playwright",
+    "shared-types"
+  ],
+  "private": true
 }

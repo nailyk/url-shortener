@@ -1,9 +1,12 @@
+version: "3.9"
+
 services:
   server:
     container_name: server
     build:
-      context: .
-      dockerfile: ./server/Dockerfile
+      context: . # Build from monorepo root
+      dockerfile: Dockerfile # Use the unified root Dockerfile
+      target: server # Target the `server` stage
     ports:
       - "3000:3000"
     env_file:
@@ -20,7 +23,9 @@ services:
   client:
     container_name: client
     build:
-      context: ./client
+      context: . # Build from monorepo root
+      dockerfile: Dockerfile # Use the unified root Dockerfile
+      target: client # Target the `client` stage
     ports:
       - "8080:80"
     env_file:

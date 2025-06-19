@@ -22,15 +22,10 @@ jobs:
       - name: 🔄 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🧰 Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
-          cache: "npm"
-          cache-dependency-path: server/package-lock.json
+      - uses: ./.github/actions/setup-node-env
 
-      - name: 📦 Install server dependencies
-        run: npm --prefix server install
+      - name: 🎨 Check code formatting with Prettier
+        run: npm run format:check
 
       - name: 🧪 Run unit tests
         run: npm run test
@@ -49,16 +44,7 @@ jobs:
       - name: 🔄 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🧰 Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: ".nvmrc"
-          cache: "npm"
-          cache-dependency-path: |
-            server/package-lock.json
-            client/package-lock.json
-            shared-types/package-lock.json
-            playwright/package-lock.json
+      - uses: ./.github/actions/setup-node-env
 
       - name: 🐳 Build and start Docker services
         run: docker compose up -d --build
@@ -71,19 +57,12 @@ jobs:
             echo "$service is healthy!"
           done
 
-      - name: 📦 Install dependencies
-        run: |
-          for dir in shared-types server client playwright; do
-            echo "Installing in $dir..."
-            npm ci --prefix "$dir"
-          done
-
       - name: 💾 Cache Playwright browsers
         id: playwright-cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
           restore-keys: |
             playwright-${{ runner.os }}-
 
