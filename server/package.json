@@ -18,7 +18,7 @@
     "express-validator": "^7.2.1",
     "ioredis": "^5.3.2",
     "ms": "^2.1.3",
-    "pg": "^8.11.1",
+    "pg": "^8.16.2",
     "sqids": "^0.3.0",
     "@url-shortener/shared-types": "*"
   },
