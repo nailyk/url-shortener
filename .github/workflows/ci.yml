@@ -47,13 +47,23 @@ jobs:
 
       - uses: ./.github/actions/setup-node-env
 
+      - name: Cache Docker images
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.docker/cache/
+            /tmp/docker-cache/
+          key: docker-images-${{ hashFiles('docker-compose.yml') }}
+          restore-keys: |
+            docker-images-
+
+      - uses: ./.github/actions/setup-node-env
+
+      - name: 🐳 Pull base images
+        run: docker compose pull --ignore-pull-failures
+
       - name: 🐳 Build and start Docker services
-        env:
-          DOCKER_BUILDKIT: 1
-          COMPOSE_DOCKER_CLI_BUILD: 1
-        run: |
-          docker compose build --parallel
-          docker compose up -d
+        run: docker compose up -d --build
 
       - name: 🕐 Wait for Docker healthchecks
         run: |
