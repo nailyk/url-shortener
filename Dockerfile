@@ -2,19 +2,16 @@
 FROM node:22-alpine AS base
 WORKDIR /app
 
-# Only copy package.json and lockfile first to leverage Docker caching
+# Copy only what's needed for dependency installation
 COPY package*.json ./
-
-# Copy workspace package.json files to resolve all workspace dependencies
 COPY server/package*.json ./server/
 COPY client/package*.json ./client/
 COPY playwright/package*.json ./playwright/
 COPY shared-types/package*.json ./shared-types/
 
-# Install all dependencies using workspaces
 RUN npm install
 
-# Copy the rest of the monorepo
+# Copy the rest
 COPY . .
 
 # Stage 2: Build client
