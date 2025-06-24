@@ -8,6 +8,8 @@ on:
     branches:
       - main
 
+permissions: {}
+
 jobs:
   unit-tests:
     name: 🧪 Unit Tests
