@@ -45,3 +45,14 @@ export type ShortenUrlErrorResponseBody =
 export type ShortenUrlResponseBody =
   | ShortenUrlSuccessResponseBody
   | ShortenUrlErrorResponseBody;
+
+/** A single shortened URL entry */
+export type ShortenedUrlEntry = {
+  id: string;
+  originalUrl: OriginalUrl;
+  shortUrl: ShortUrl;
+  expiresAt: Date | null;
+};
+
+/** Response body for GET /api/urls */
+export type GetAllUrlsResponseBody = ShortenedUrlEntry[];

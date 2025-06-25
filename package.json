@@ -24,5 +24,6 @@
     "playwright",
     "shared-types"
   ],
-  "private": true
+  "private": true,
+  "author": "nailyk"
 }

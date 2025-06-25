@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import shortenUrlRouter from "./routers/shortenUrl.router.js";
+import apiRouter from "./routers/api.router.js";
 import redirectUrlRouter from "./routers/redirectUrl.router.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { loadEnv } from "./loadEnv.js";
@@ -11,7 +11,7 @@ const app = express();
 
 app.use(cors());
 
-app.use("/api/shorten", shortenUrlRouter);
+app.use("/api/", apiRouter);
 app.use("/", redirectUrlRouter);
 
 app.use(errorHandler);
