@@ -33,7 +33,7 @@ jobs:
         run: npm run test
 
   e2e-tests:
-    name: 🚀 End-to-End Tests
+    name: 🧩 End-to-End Tests
     timeout-minutes: 10
     runs-on: ubuntu-latest
 
@@ -46,21 +46,6 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: ./.github/actions/setup-node-env
-
-      - name: Cache Docker images
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.docker/cache/
-            /tmp/docker-cache/
-          key: docker-images-${{ hashFiles('docker-compose.yml') }}
-          restore-keys: |
-            docker-images-
-
-      - uses: ./.github/actions/setup-node-env
-
-      - name: 🐳 Pull base images
-        run: docker compose pull --ignore-pull-failures
 
       - name: 🐳 Build and start Docker services
         run: docker compose up -d --build
