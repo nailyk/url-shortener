@@ -8,7 +8,11 @@ import {
   AliasIsExpiredError,
   AliasDoesNotExistError,
 } from "../errors/errors.js";
-import { Alias, OriginalUrl } from "@url-shortener/shared-types";
+import {
+  Alias,
+  OriginalUrl,
+  ShortenedUrlEntry,
+} from "@url-shortener/shared-types";
 
 // TODO create service which can be easily unit tested
 
@@ -63,7 +67,12 @@ async function resolveOriginalUrl(alias: Alias): Promise<OriginalUrl> {
   return original_url;
 }
 
+async function getAllShortenedUrls(): Promise<ShortenedUrlEntry[]> {
+  return await postgresClient.getAllShortenedUrls();
+}
+
 export default {
   createAlias,
   resolveOriginalUrl,
+  getAllShortenedUrls,
 };

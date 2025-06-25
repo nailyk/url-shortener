@@ -1,5 +1,6 @@
 import express, { Router, Request, Response, NextFunction } from "express";
 import {
+  GetAllUrlsResponseBody,
   ShortenUrlRequestBody,
   ShortenUrlResponseBody,
 } from "@url-shortener/shared-types";
@@ -11,7 +12,7 @@ const router = Router();
 router.use(express.json());
 
 router.post(
-  "/",
+  "/urls",
   shortenUrlRequestValidators,
   validateRequestHandler,
   async (
@@ -23,6 +24,18 @@ router.post(
     try {
       const alias = await urlService.createAlias(url, customAlias, expiresIn);
       res.json({ shortUrl: `${process.env.BASE_URL}/${alias}` });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+router.get(
+  "/urls",
+  async (_, res: Response<GetAllUrlsResponseBody>, next: NextFunction) => {
+    try {
+      const result = await urlService.getAllShortenedUrls();
+      res.json(result);
     } catch (err) {
       next(err);
     }

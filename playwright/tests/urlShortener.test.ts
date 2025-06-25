@@ -13,10 +13,9 @@ test.describe("URL Shortener E2E", () => {
     // Submit
     await page.click('button[type="submit"]');
 
-    const shortUrlLink = page.locator('a[name="shortUrl"]');
+    const shortUrlLink = page.locator("#shortUrl");
     await expect(shortUrlLink).toBeVisible();
 
-    // Check that the href matches your expected short URL
     await expect(shortUrlLink).toHaveAttribute(
       "href",
       `http://localhost:3000/${customAlias}`,

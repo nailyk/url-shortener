@@ -1,0 +1,260 @@
+/* Base & layout */
+
+body {
+  background: linear-gradient(120deg, #667eea 0%, #5a67d8 100%);
+  min-height: 100vh;
+  margin: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  padding: 1rem;
+}
+
+.app-container {
+  max-width: 600px;
+  margin: 4rem auto;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 12px 32px rgba(102, 126, 234, 0.15);
+  padding: 3rem 2.5rem;
+  animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Title */
+
+.app-title {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  color: #4338ca;
+  font-size: 2.25rem;
+  font-weight: 800;
+}
+
+/* Tabs */
+
+.app-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-bottom: 2.5rem;
+}
+
+.app-tab {
+  padding: 0.6rem 1.6rem;
+  font-weight: 600;
+  background: #e2e8f0;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.app-tab.active {
+  background: #4338ca;
+  color: white;
+  box-shadow: 0 2px 6px rgba(67, 56, 202, 0.3);
+}
+
+/* Form */
+
+.app-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.app-label {
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.app-input {
+  width: 100%;
+  padding: 0.9rem;
+  border-radius: 10px;
+  border: 1.5px solid #cbd5e1;
+  font-size: 1.05rem;
+  transition:
+    border 0.2s,
+    background 0.2s;
+  outline: none;
+  background: #f8fafc;
+}
+
+.app-input:focus {
+  border-color: #7c3aed;
+  background: #eef2ff;
+}
+
+.app-button {
+  padding: 1rem;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(90deg, #7c3aed 0%, #6366f1 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-top: 0.8rem;
+  transition:
+    background 0.2s,
+    transform 0.1s;
+}
+
+.app-button:hover {
+  background: linear-gradient(90deg, #6366f1 0%, #7c3aed 100%);
+  transform: translateY(-2px) scale(1.02);
+}
+
+/* Error */
+
+.app-error {
+  color: #e53e3e;
+  background: #fff5f5;
+  border: 1.5px solid #fed7d7;
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  margin-top: 1.8rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 1.05rem;
+}
+
+/* Short URL Display */
+
+.app-shorturl {
+  margin-top: 2rem;
+  background: #f0fff4;
+  border: 1.5px solid #c6f6d5;
+  border-radius: 10px;
+  padding: 1.2rem;
+  text-align: center;
+  animation: fadeIn 0.5s ease;
+}
+
+.app-shorturl span {
+  color: #059669;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.app-shorturl-link {
+  color: #2563eb;
+  font-weight: 700;
+  font-size: 1.2rem;
+  word-break: break-word;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.app-shorturl-link:hover {
+  color: #7c3aed;
+  text-decoration: underline;
+}
+
+/* URL List Cards */
+
+.url-card {
+  background: #f9fbfd;
+  border: 1.5px solid #d1d9e6;
+  border-radius: 14px;
+  padding: 1.4rem 1.6rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.url-card:hover {
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.25);
+}
+
+/* Individual info section inside card */
+
+.url-section {
+  background: #ffffff;
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.9rem;
+  box-shadow: inset 0 0 4px rgba(102, 126, 234, 0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+.url-label {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #3b4252;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.url-link {
+  font-size: 1.05rem;
+  color: #4c51bf;
+  font-weight: 600;
+  word-break: break-word;
+  transition: color 0.25s ease;
+  text-decoration: none;
+}
+
+.url-link:hover {
+  color: #6b46c1;
+  text-decoration: underline;
+}
+
+.url-short {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #5a67d8;
+  word-break: break-word;
+  margin-top: 0.2rem;
+}
+
+.url-expiration {
+  font-size: 0.9rem;
+  color: #718096;
+  font-weight: 500;
+  margin-top: 0.15rem;
+  font-style: italic;
+}
+
+/* Responsive */
+
+@media (max-width: 640px) {
+  .app-container {
+    margin: 2rem 1rem;
+    padding: 2rem 1.4rem;
+  }
+
+  .app-title {
+    font-size: 1.8rem;
+  }
+
+  .app-tab {
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .app-input,
+  .app-button {
+    font-size: 1rem;
+  }
+
+  .app-shorturl-link {
+    font-size: 1.1rem;
+  }
+}

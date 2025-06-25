@@ -38,6 +38,5 @@
     "typescript": "^5.8.3",
     "vitest": "^3.2.3"
   },
-  "license": "MIT",
   "author": "nailyk"
 }

@@ -1,4 +1,8 @@
-import { Alias, OriginalUrl } from "@url-shortener/shared-types";
+import {
+  Alias,
+  OriginalUrl,
+  ShortenedUrlEntry,
+} from "@url-shortener/shared-types";
 import { Pool } from "pg";
 
 let pool: Pool | null = null;
@@ -46,8 +50,19 @@ async function saveUrl(
   );
 }
 
+async function getAllShortenedUrls(): Promise<ShortenedUrlEntry[]> {
+  const res = await initPool().query("SELECT * FROM url_mappings");
+  return res.rows.map((row) => ({
+    id: row.id,
+    originalUrl: row.original_url,
+    shortUrl: `${process.env.BASE_URL}/${row.alias}`,
+    expiresAt: row.expires_at ? new Date(row.expires_at) : null,
+  }));
+}
+
 export default {
   getOriginalUrl,
   doesAliasExist,
   saveUrl,
+  getAllShortenedUrls,
 };
