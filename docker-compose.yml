@@ -14,9 +14,9 @@ services:
       - redis
     healthcheck:
       test: ["CMD", "sh", "-c", "nc -z localhost 3000 || exit 1"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
+      interval: 2s
+      timeout: 2s
+      retries: 5
 
   client:
     container_name: client
@@ -32,9 +32,9 @@ services:
       - server
     healthcheck:
       test: ["CMD", "sh", "-c", "nc -z localhost 80 || exit 1"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
+      interval: 2s
+      timeout: 2s
+      retries: 5
 
   redis:
     container_name: redis

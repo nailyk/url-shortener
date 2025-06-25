@@ -1,8 +1,15 @@
 FROM node:22-alpine AS base
 WORKDIR /app
+
 COPY package*.json ./
-COPY . .
+COPY server/package*.json ./server/
+COPY client/package*.json ./client/
+COPY playwright/package*.json ./playwright/
+COPY shared-types/package*.json ./shared-types/
+
 RUN npm install
+
+COPY . .
 
 FROM base AS client-build
 WORKDIR /app/client

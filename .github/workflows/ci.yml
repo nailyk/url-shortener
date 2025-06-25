@@ -1,4 +1,4 @@
-name: Tests
+name: CI
 
 on:
   pull_request:
@@ -33,10 +33,9 @@ jobs:
         run: npm run test
 
   e2e-tests:
-    name: 🚀 End-to-End Tests
+    name: 🧩 End-to-End Tests
     timeout-minutes: 10
     runs-on: ubuntu-latest
-    needs: unit-tests
 
     concurrency:
       group: e2e-${{ github.head_ref }}
@@ -53,11 +52,15 @@ jobs:
 
       - name: 🕐 Wait for Docker healthchecks
         run: |
-          for service in redis postgres server client; do
-            echo "Waiting for $service to be healthy..."
-            timeout 120 bash -c "until [ \"\$(docker inspect -f '{{.State.Health.Status}}' $service 2>/dev/null)\" = \"healthy\" ]; do echo 'Still waiting for $service...'; sleep 2; done"
-            echo "$service is healthy!"
+          services=(redis postgres server client)
+          for service in "${services[@]}"; do
+            (
+              echo "Waiting for $service to be healthy..."
+              timeout 60 bash -c "until [ \"\$(docker inspect -f '{{.State.Health.Status}}' $service 2>/dev/null)\" = \"healthy\" ]; do sleep 1; done"
+              echo "$service is healthy!"
+            ) &
           done
+          wait
 
       - name: 💾 Cache Playwright browsers
         id: playwright-cache
