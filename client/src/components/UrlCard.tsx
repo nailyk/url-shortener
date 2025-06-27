@@ -1,6 +1,11 @@
-import { ShortenedUrlEntry } from "@url-shortener/shared-types";
+import { UrlMapping } from "@url-shortener/shared-types";
 
-export default function UrlCard({ item }: { item: ShortenedUrlEntry }) {
+type UrlCardProps = {
+  item: UrlMapping;
+  onDelete?: (id: number) => void;
+};
+
+export default function UrlCard({ item, onDelete }: UrlCardProps) {
   return (
     <div key={item.id} className="url-card">
       <div className="url-section">
@@ -34,6 +39,16 @@ export default function UrlCard({ item }: { item: ShortenedUrlEntry }) {
             {new Date(item.expiresAt).toLocaleString()}
           </span>
         </div>
+      )}
+
+      {onDelete && (
+        <button
+          className="app-button"
+          style={{ marginTop: "0.5rem", background: "#e53e3e" }}
+          onClick={() => onDelete(item.id)}
+        >
+          Delete
+        </button>
       )}
     </div>
   );

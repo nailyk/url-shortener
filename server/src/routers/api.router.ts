@@ -1,28 +1,36 @@
 import express, { Router, Request, Response, NextFunction } from "express";
 import {
-  GetAllUrlsResponseBody,
-  ShortenUrlRequestBody,
-  ShortenUrlResponseBody,
+  GetAllUrlMappingsResponseBody,
+  CreateUrlMappingRequestBody,
+  CreateUrlMappingResponseBody,
+  DeleteUrlMappingResponseBody,
 } from "@url-shortener/shared-types";
-import { shortenUrlRequestValidators } from "../middlewares/shortenUrlRequestValidators.js";
-import urlService from "../services/urlService.js";
+import {
+  createUrlMappingValidators,
+  deleteUrlMappingValidators,
+} from "../middlewares/requestValidators.js";
 import { validateRequestHandler } from "../middlewares/validateRequestHandler.js";
+import urlMappingService from "../services/urlMappingService.js";
 
 const router = Router();
 router.use(express.json());
 
 router.post(
   "/urls",
-  shortenUrlRequestValidators,
+  createUrlMappingValidators,
   validateRequestHandler,
   async (
-    req: Request<{}, any, ShortenUrlRequestBody>,
-    res: Response<ShortenUrlResponseBody>,
+    req: Request<{}, any, CreateUrlMappingRequestBody>,
+    res: Response<CreateUrlMappingResponseBody>,
     next: NextFunction,
   ) => {
     const { url, customAlias, expiresIn } = req.body;
     try {
-      const alias = await urlService.createAlias(url, customAlias, expiresIn);
+      const alias = await urlMappingService.createAlias(
+        url,
+        customAlias,
+        expiresIn,
+      );
       res.json({ shortUrl: `${process.env.BASE_URL}/${alias}` });
     } catch (err) {
       next(err);
@@ -32,10 +40,33 @@ router.post(
 
 router.get(
   "/urls",
-  async (_, res: Response<GetAllUrlsResponseBody>, next: NextFunction) => {
+  async (
+    _,
+    res: Response<GetAllUrlMappingsResponseBody>,
+    next: NextFunction,
+  ) => {
     try {
-      const result = await urlService.getAllShortenedUrls();
+      const result = await urlMappingService.getAll();
       res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+router.delete(
+  "/urls/:id",
+  deleteUrlMappingValidators,
+  validateRequestHandler,
+  async (
+    req: Request<{ id: string }>,
+    res: Response<DeleteUrlMappingResponseBody>,
+    next: NextFunction,
+  ) => {
+    const id = Number(req.params.id);
+    try {
+      await urlMappingService.deleteById(id);
+      res.sendStatus(204);
     } catch (err) {
       next(err);
     }

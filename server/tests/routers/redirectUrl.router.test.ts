@@ -2,16 +2,16 @@ import express, { Request, Response, NextFunction } from "express";
 import request from "supertest";
 import { describe, it, beforeEach, expect, vi } from "vitest";
 import redirectUrlRouter from "../../src/routers/redirectUrl.router.js";
-import urlService from "../../src/services/urlService.js";
 import { AliasDoesNotExistError } from "../../src/errors/errors.js";
+import urlMappingService from "../../src/services/urlMappingService.js";
 
-vi.mock("../../src/services/urlService.js", () => ({
+vi.mock("../../src/services/urlMappingService.js", () => ({
   default: {
     resolveOriginalUrl: vi.fn(),
   },
 }));
 
-const mockedUrlService = vi.mocked(urlService);
+const mockedUrlMappingService = vi.mocked(urlMappingService);
 
 const app = express();
 app.use("/", redirectUrlRouter);
@@ -27,7 +27,7 @@ describe("GET /:alias", () => {
   });
 
   it("should redirect to the original URL", async () => {
-    mockedUrlService.resolveOriginalUrl.mockResolvedValue(
+    mockedUrlMappingService.resolveOriginalUrl.mockResolvedValue(
       "https://example.com",
     );
 
@@ -35,11 +35,13 @@ describe("GET /:alias", () => {
 
     expect(res.status).toBe(302);
     expect(res.headers.location).toBe("https://example.com");
-    expect(mockedUrlService.resolveOriginalUrl).toHaveBeenCalledWith("abc123");
+    expect(mockedUrlMappingService.resolveOriginalUrl).toHaveBeenCalledWith(
+      "abc123",
+    );
   });
 
-  it("should respond with 404 if urlService throws an error", async () => {
-    mockedUrlService.resolveOriginalUrl.mockRejectedValue(
+  it("should respond with 404 if urlMappingService throws an error", async () => {
+    mockedUrlMappingService.resolveOriginalUrl.mockRejectedValue(
       new AliasDoesNotExistError("toto"),
     );
 
@@ -47,6 +49,8 @@ describe("GET /:alias", () => {
 
     expect(res.status).toBe(404);
     expect(res.body.error).toBe('Alias "toto" does not exist');
-    expect(mockedUrlService.resolveOriginalUrl).toHaveBeenCalledWith("toto");
+    expect(mockedUrlMappingService.resolveOriginalUrl).toHaveBeenCalledWith(
+      "toto",
+    );
   });
 });

@@ -119,6 +119,13 @@ body {
   transform: translateY(-2px) scale(1.02);
 }
 
+.app-button[style*="#e53e3e"] {
+  background: #e53e3e !important;
+}
+.app-button[style*="#e53e3e"]:hover {
+  background: #c53030 !important;
+}
+
 /* Error */
 
 .app-error {
