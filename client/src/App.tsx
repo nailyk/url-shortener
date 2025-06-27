@@ -1,10 +1,12 @@
 import { useEffect, useState, FormEvent } from "react";
+import toast, { Toaster } from "react-hot-toast";
+
 import "./App.css";
 
 import {
-  GetAllUrlsResponseBody,
-  ShortenedUrlEntry,
-  ShortenUrlSuccessResponseBody,
+  GetAllUrlMappingsResponseBody,
+  UrlMapping,
+  CreateUrlMappingSuccessResponseBody,
   ApiErrorResponseBody,
   ApiValidationErrorResponseBody,
 } from "@url-shortener/shared-types";
@@ -24,14 +26,14 @@ export default function App() {
   const [shortUrl, setShortUrl] = useState("");
   const [error, setError] = useState("");
 
-  const [shortUrls, setShortUrls] = useState<ShortenedUrlEntry[]>([]);
+  const [shortUrls, setShortUrls] = useState<UrlMapping[]>([]);
   const [loadingUrls, setLoadingUrls] = useState(false);
 
   const fetchShortUrls = async (): Promise<void> => {
     setLoadingUrls(true);
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/urls`);
-      const data: GetAllUrlsResponseBody | ApiErrorResponseBody =
+      const data: GetAllUrlMappingsResponseBody | ApiErrorResponseBody =
         await res.json();
 
       if (!res.ok) {
@@ -40,7 +42,7 @@ export default function App() {
         throw new Error(errorText);
       }
 
-      setShortUrls(data as ShortenedUrlEntry[]);
+      setShortUrls(data as UrlMapping[]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Network error");
     } finally {
@@ -76,7 +78,7 @@ export default function App() {
       });
 
       const data:
-        | ShortenUrlSuccessResponseBody
+        | CreateUrlMappingSuccessResponseBody
         | ApiErrorResponseBody
         | ApiValidationErrorResponseBody = await res.json();
 
@@ -87,7 +89,7 @@ export default function App() {
           setError((data as ApiErrorResponseBody).error || "Unknown error");
         }
       } else {
-        setShortUrl((data as ShortenUrlSuccessResponseBody).shortUrl);
+        setShortUrl((data as CreateUrlMappingSuccessResponseBody).shortUrl);
         setUrl("");
         setCustomAlias("");
         setExpiresIn("");
@@ -97,30 +99,61 @@ export default function App() {
     }
   };
 
+  const handleDelete = async (id: number) => {
+    if (!window.confirm("Are you sure you want to delete this URL mapping?")) {
+      return;
+    }
+    setError("");
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/urls/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to delete URL");
+      }
+      setShortUrls((urls) => urls.filter((u) => u.id !== id));
+      toast.success("URL mapping deleted!");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to delete URL mapping",
+      );
+    }
+  };
+
   return (
-    <div className="app-container">
-      <h1 className="app-title">🔗 URL Shortener</h1>
+    <>
+      <Toaster position="top-right" />
+      <div className="app-container">
+        <h1 className="app-title">🔗 URL Shortener</h1>
 
-      {/* Use your Tabs component */}
-      <Tabs currentTab={tab} onChange={setTab} />
+        {/* Use your Tabs component */}
+        <Tabs currentTab={tab} onChange={setTab} />
 
-      {tab === "create" && (
-        <>
-          <ShortenUrlForm
-            url={url}
-            customAlias={customAlias}
-            expiresIn={expiresIn}
-            onChangeUrl={setUrl}
-            onChangeAlias={setCustomAlias}
-            onChangeExpires={setExpiresIn}
-            onSubmit={handleSubmit}
+        {tab === "create" && (
+          <>
+            <ShortenUrlForm
+              url={url}
+              customAlias={customAlias}
+              expiresIn={expiresIn}
+              onChangeUrl={setUrl}
+              onChangeAlias={setCustomAlias}
+              onChangeExpires={setExpiresIn}
+              onSubmit={handleSubmit}
+            />
+            <ErrorMessage message={error} />
+            {shortUrl && <ShortUrlDisplay shortUrl={shortUrl} />}
+          </>
+        )}
+
+        {tab === "list" && (
+          <UrlList
+            items={shortUrls}
+            loading={loadingUrls}
+            onDelete={handleDelete}
           />
-          <ErrorMessage message={error} />
-          {shortUrl && <ShortUrlDisplay shortUrl={shortUrl} />}
-        </>
-      )}
-
-      {tab === "list" && <UrlList items={shortUrls} loading={loadingUrls} />}
-    </div>
+        )}
+      </div>
+    </>
   );
 }

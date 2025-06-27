@@ -27,3 +27,13 @@ export class AliasDoesNotExistError extends CustomError {
     super("AliasDoesNotExistError", `Alias "${alias}" does not exist`, 404);
   }
 }
+
+export class UrlMappingNotFoundError extends CustomError {
+  constructor(id: number) {
+    super(
+      "UrlMappingNotFoundError",
+      `URL mapping with id ${id} does not exist`,
+      404,
+    );
+  }
+}

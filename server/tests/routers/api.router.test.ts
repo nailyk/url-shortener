@@ -1,40 +1,46 @@
 import express from "express";
 import request from "supertest";
 import { describe, it, beforeEach, expect, vi } from "vitest";
-import urlService from "../../src/services/urlService.js";
 import apiRouter from "../../src/routers/api.router.js";
-import { AliasAlreadyExistsError } from "../../src/errors/errors.js";
+import {
+  AliasAlreadyExistsError,
+  UrlMappingNotFoundError,
+} from "../../src/errors/errors.js";
 import { errorHandler } from "../../src/middlewares/errorHandler.js";
-import { ShortenedUrlEntry } from "@url-shortener/shared-types";
+import { UrlMapping } from "@url-shortener/shared-types";
+import urlMappingService from "../../src/services/urlMappingService.js";
 
-vi.mock("../../src/services/urlService.js", () => ({
+vi.mock("../../src/services/urlMappingService.js", () => ({
   default: {
     createAlias: vi.fn(),
-    getAllShortenedUrls: vi.fn(),
+    getAll: vi.fn(),
+    deleteById: vi.fn(),
   },
 }));
 
-const mockedUrlService = vi.mocked(urlService);
+const mockedUrlMappingService = vi.mocked(urlMappingService);
 
 const app = express();
 app.use(express.json());
 app.use("/api/", apiRouter, errorHandler);
 
-const postShorten = (body: object) => request(app).post("/api/urls").send(body);
-const getUrls = () => request(app).get("/api/urls");
-
-const expectValidationError = async (
-  body: object,
-  expectedError: { path: string; msg: string | RegExp },
-) => {
-  const res = await postShorten(body);
-  expect(res.status).toBe(400);
-  expect(res.body.errors).toEqual(
-    expect.arrayContaining([expect.objectContaining(expectedError)]),
-  );
-};
+const createUrlMapping = (body: object) =>
+  request(app).post("/api/urls").send(body);
+const getUrlMappings = () => request(app).get("/api/urls");
+const deleteUrlMapping = (id: number) => request(app).delete(`/api/urls/${id}`);
 
 describe("POST /api/urls", () => {
+  const expectValidationError = async (
+    body: object,
+    expectedError: { path: string; msg: string | RegExp },
+  ) => {
+    const res = await createUrlMapping(body);
+    expect(res.status).toBe(400);
+    expect(res.body.errors).toEqual(
+      expect.arrayContaining([expect.objectContaining(expectedError)]),
+    );
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.BASE_URL = "http://localhost:3000";
@@ -86,9 +92,9 @@ describe("POST /api/urls", () => {
   });
 
   it("should return 200 and shortUrl for valid input", async () => {
-    mockedUrlService.createAlias.mockResolvedValue("abc123");
+    mockedUrlMappingService.createAlias.mockResolvedValue("abc123");
 
-    const res = await postShorten({
+    const res = await createUrlMapping({
       url: "https://example.com",
       customAlias: "myalias",
       expiresIn: "5m",
@@ -96,7 +102,7 @@ describe("POST /api/urls", () => {
 
     expect(res.status).toBe(200);
     expect(res.body.shortUrl).toBe(`${process.env.BASE_URL}/abc123`);
-    expect(mockedUrlService.createAlias).toHaveBeenCalledWith(
+    expect(mockedUrlMappingService.createAlias).toHaveBeenCalledWith(
       "https://example.com",
       "myalias",
       "5m",
@@ -104,11 +110,11 @@ describe("POST /api/urls", () => {
   });
 
   it("should return 409 if alias already exists", async () => {
-    mockedUrlService.createAlias.mockRejectedValue(
+    mockedUrlMappingService.createAlias.mockRejectedValue(
       new AliasAlreadyExistsError("taken"),
     );
 
-    const res = await postShorten({
+    const res = await createUrlMapping({
       url: "https://example.com",
       customAlias: "taken",
     });
@@ -124,11 +130,11 @@ describe("GET /api/urls", () => {
   });
 
   const buildUrlEntry = (
-    id: string,
+    id: number,
     alias: string,
     originalUrl: string,
     msFromNow: number,
-  ): ShortenedUrlEntry => {
+  ): UrlMapping => {
     const now = new Date();
     return {
       id,
@@ -139,31 +145,76 @@ describe("GET /api/urls", () => {
   };
 
   it("should return 200 and an empty array", async () => {
-    mockedUrlService.getAllShortenedUrls.mockResolvedValue([]);
+    mockedUrlMappingService.getAll.mockResolvedValue([]);
 
-    const res = await getUrls();
+    const res = await getUrlMappings();
     expect(res.status).toBe(200);
     expect(res.body).toEqual([]);
   });
 
   it("should return 200 and a single URL entry", async () => {
-    const url = buildUrlEntry("1", "one", "https://one.com", 3600000);
-    mockedUrlService.getAllShortenedUrls.mockResolvedValue([url]);
+    const url = buildUrlEntry(1, "one", "https://one.com", 3600000);
+    mockedUrlMappingService.getAll.mockResolvedValue([url]);
 
-    const res = await getUrls();
+    const res = await getUrlMappings();
     expect(res.status).toBe(200);
     expect(res.body).toEqual([JSON.parse(JSON.stringify(url))]);
   });
 
   it("should return 200 and multiple URL entries", async () => {
-    const urls: ShortenedUrlEntry[] = [
-      buildUrlEntry("1", "abc", "https://abc.com", 60000),
-      buildUrlEntry("2", "def", "https://def.com", 120000),
+    const urls: UrlMapping[] = [
+      buildUrlEntry(1, "abc", "https://abc.com", 60000),
+      buildUrlEntry(2, "def", "https://def.com", 120000),
     ];
-    mockedUrlService.getAllShortenedUrls.mockResolvedValue(urls);
+    mockedUrlMappingService.getAll.mockResolvedValue(urls);
 
-    const res = await getUrls();
+    const res = await getUrlMappings();
     expect(res.status).toBe(200);
     expect(res.body).toEqual(JSON.parse(JSON.stringify(urls)));
+  });
+});
+
+describe("DELETE /api/urls/:id", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should return 204 when deletion is successful", async () => {
+    mockedUrlMappingService.deleteById.mockResolvedValue();
+
+    const res = await deleteUrlMapping(123);
+    expect(res.status).toBe(204);
+    expect(res.body).toEqual({});
+  });
+
+  it("should return 400 for invalid ID param", async () => {
+    const res = await request(app).delete("/api/urls/not-a-number");
+    expect(res.status).toBe(400);
+    expect(res.body.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: "id", msg: "ID must be an integer" }),
+      ]),
+    );
+  });
+
+  it("should return 404 if the URL mapping does not exist", async () => {
+    mockedUrlMappingService.deleteById.mockRejectedValue(
+      new UrlMappingNotFoundError(999),
+    );
+
+    const res = await deleteUrlMapping(999);
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe("URL mapping with id 999 does not exist");
+  });
+
+  it("should return 500 for unexpected errors", async () => {
+    mockedUrlMappingService.deleteById.mockRejectedValue(
+      new Error("Unexpected DB failure"),
+    );
+
+    const res = await deleteUrlMapping(999);
+    expect(res.status).toBe(500);
+    console.log(res.body);
+    expect(res.body.error).toBe("Internal Server Error");
   });
 });

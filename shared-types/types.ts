@@ -6,15 +6,23 @@ export type OriginalUrl = string;
 type ShortUrl = string;
 export type Alias = string;
 
+/** A single shortened URL entry */
+export type UrlMapping = {
+  id: number;
+  originalUrl: OriginalUrl;
+  shortUrl: ShortUrl;
+  expiresAt: Date | null;
+};
+
 /** Request body for POST /urls */
-export type ShortenUrlRequestBody = {
+export type CreateUrlMappingRequestBody = {
   url: OriginalUrl;
   customAlias: Alias;
   expiresIn?: ms.StringValue;
 };
 
 /** Success response for POST /urls */
-export type ShortenUrlSuccessResponseBody = {
+export type CreateUrlMappingSuccessResponseBody = {
   shortUrl: ShortUrl;
 };
 
@@ -37,22 +45,23 @@ export type ApiValidationErrorResponseBody = {
 };
 
 /** Union of all error types for this endpoint */
-export type ShortenUrlErrorResponseBody =
+export type CreateUrlMappingErrorResponseBody =
   | ApiErrorResponseBody
   | ApiValidationErrorResponseBody;
 
 /** Final union type for all responses */
-export type ShortenUrlResponseBody =
-  | ShortenUrlSuccessResponseBody
-  | ShortenUrlErrorResponseBody;
-
-/** A single shortened URL entry */
-export type ShortenedUrlEntry = {
-  id: string;
-  originalUrl: OriginalUrl;
-  shortUrl: ShortUrl;
-  expiresAt: Date | null;
-};
+export type CreateUrlMappingResponseBody =
+  | CreateUrlMappingSuccessResponseBody
+  | CreateUrlMappingErrorResponseBody;
 
 /** Response body for GET /api/urls */
-export type GetAllUrlsResponseBody = ShortenedUrlEntry[];
+export type GetAllUrlMappingsResponseBody = UrlMapping[];
+
+/** Error response for DELETE /urls/:id */
+export type DeleteUrlMappingErrorResponseBody =
+  | ApiErrorResponseBody
+  | ApiValidationErrorResponseBody;
+
+export type DeleteUrlMappingResponseBody =
+  | undefined
+  | DeleteUrlMappingErrorResponseBody;

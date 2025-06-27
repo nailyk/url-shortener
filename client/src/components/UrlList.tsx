@@ -1,12 +1,13 @@
-import { ShortenedUrlEntry } from "@url-shortener/shared-types";
+import { UrlMapping } from "@url-shortener/shared-types";
 import UrlCard from "./UrlCard";
 
 type UrlListProps = {
-  items: ShortenedUrlEntry[];
+  items: UrlMapping[];
   loading: boolean;
+  onDelete?: (id: number) => void;
 };
 
-export default function UrlList({ items, loading }: UrlListProps) {
+export default function UrlList({ items, loading, onDelete }: UrlListProps) {
   if (loading) {
     return <p style={{ textAlign: "center" }}>Loading...</p>;
   }
@@ -18,7 +19,7 @@ export default function UrlList({ items, loading }: UrlListProps) {
   return (
     <div className="app-url-list">
       {items.map((item) => (
-        <UrlCard key={item.id} item={item} />
+        <UrlCard key={item.id} item={item} onDelete={onDelete} />
       ))}
     </div>
   );

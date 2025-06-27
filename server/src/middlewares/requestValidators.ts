@@ -1,7 +1,7 @@
 import { checkSchema } from "express-validator";
 import ms from "ms";
 
-export const shortenUrlRequestValidators = checkSchema({
+export const createUrlMappingValidators = checkSchema({
   url: {
     in: ["body"],
     exists: {
@@ -32,6 +32,25 @@ export const shortenUrlRequestValidators = checkSchema({
       options: (value) => !!ms(value),
       errorMessage:
         'Invalid duration format. Use something like "5m", "2h", "1d", etc...',
+    },
+  },
+});
+
+export const deleteUrlMappingValidators = checkSchema({
+  id: {
+    in: ["params"],
+    exists: {
+      errorMessage: "ID parameter is required",
+      bail: true,
+    },
+    isInt: {
+      errorMessage: "ID must be an integer",
+      bail: true,
+    },
+    toInt: true,
+    custom: {
+      options: (value) => value > 0,
+      errorMessage: "ID must be a positive integer",
     },
   },
 });
