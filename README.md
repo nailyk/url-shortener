@@ -15,7 +15,7 @@ Supports custom aliases + expiration time
 
 ---
 
-![App Home Screen](./resources/homescreen.png)
+![App Demo](./resources/app-demo.gif)
 
 ## Project Structure
 
