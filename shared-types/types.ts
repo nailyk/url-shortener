@@ -3,7 +3,7 @@ import { ValidationError } from "express-validator";
 
 /** Semantic aliases */
 export type OriginalUrl = string;
-type ShortUrl = string;
+export type ShortUrl = string;
 export type Alias = string;
 
 /** A single shortened URL entry */

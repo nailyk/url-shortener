@@ -22,7 +22,7 @@ export class UrlMappingCacheRepository {
     return await this.client.get(this.getKey(alias));
   }
 
-  async cacheOriginalUrl(
+  async cacheUrlMapping(
     originalUrl: OriginalUrl,
     alias: Alias,
     expiresInMs?: number,
@@ -37,6 +37,10 @@ export class UrlMappingCacheRepository {
     } else {
       await this.client.set(this.getKey(alias), originalUrl);
     }
+  }
+
+  async deleteUrlMapping(alias: Alias): Promise<void> {
+    await this.client.del(this.getKey(alias));
   }
 
   async incr(): Promise<number> {

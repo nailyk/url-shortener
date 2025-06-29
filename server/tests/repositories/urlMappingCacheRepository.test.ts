@@ -1,17 +1,12 @@
-// urlMappingCacheRepository.test.ts
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { UrlMappingCacheRepository } from "../../src/repositories/urlMappingCacheRepository.js";
 
-const mockGet = vi.fn();
-const mockSet = vi.fn();
-const mockSetex = vi.fn();
-const mockIncr = vi.fn();
-
 const mockRedisClient = {
-  get: mockGet,
-  set: mockSet,
-  setex: mockSetex,
-  incr: mockIncr,
+  get: vi.fn(),
+  set: vi.fn(),
+  setex: vi.fn(),
+  incr: vi.fn(),
+  del: vi.fn(),
 };
 
 describe("UrlMappingCacheRepository", () => {
@@ -24,46 +19,54 @@ describe("UrlMappingCacheRepository", () => {
 
   describe("getOriginalUrl", () => {
     it("calls redis.get with correct key and returns result", async () => {
-      mockGet.mockResolvedValueOnce("https://example.com");
+      mockRedisClient.get.mockResolvedValueOnce("https://example.com");
 
       const result = await repo.getOriginalUrl("alias123");
 
-      expect(mockGet).toHaveBeenCalledWith("url:alias123");
+      expect(mockRedisClient.get).toHaveBeenCalledWith("url:alias123");
       expect(result).toBe("https://example.com");
     });
   });
 
-  describe("cacheOriginalUrl", () => {
+  describe("cacheUrlMapping", () => {
     it("calls redis.setex if expiresInMs provided", async () => {
-      await repo.cacheOriginalUrl("https://example.com", "alias123", 15000);
+      await repo.cacheUrlMapping("https://example.com", "alias123", 15000);
 
-      expect(mockSetex).toHaveBeenCalledWith(
+      expect(mockRedisClient.setex).toHaveBeenCalledWith(
         "url:alias123",
         15, // 15000 ms / 1000 = 15 seconds
         "https://example.com",
       );
-      expect(mockSet).not.toHaveBeenCalled();
+      expect(mockRedisClient.set).not.toHaveBeenCalled();
     });
 
     it("calls redis.set if expiresInMs not provided", async () => {
-      await repo.cacheOriginalUrl("https://example.com", "alias123");
+      await repo.cacheUrlMapping("https://example.com", "alias123");
 
-      expect(mockSet).toHaveBeenCalledWith(
+      expect(mockRedisClient.set).toHaveBeenCalledWith(
         "url:alias123",
         "https://example.com",
       );
-      expect(mockSetex).not.toHaveBeenCalled();
+      expect(mockRedisClient.setex).not.toHaveBeenCalled();
     });
   });
 
   describe("incr", () => {
     it("calls redis.incr with the counter key and returns result", async () => {
-      mockIncr.mockResolvedValueOnce(42);
+      mockRedisClient.incr.mockResolvedValueOnce(42);
 
       const result = await repo.incr();
 
-      expect(mockIncr).toHaveBeenCalledWith("url:counter");
+      expect(mockRedisClient.incr).toHaveBeenCalledWith("url:counter");
       expect(result).toBe(42);
+    });
+  });
+
+  describe("deleteUrlMapping", () => {
+    it("calls redis.del with the correct key", async () => {
+      await repo.deleteUrlMapping("alias123");
+
+      expect(mockRedisClient.del).toHaveBeenCalledWith("url:alias123");
     });
   });
 });

@@ -26,12 +26,12 @@ router.post(
   ) => {
     const { url, customAlias, expiresIn } = req.body;
     try {
-      const alias = await urlMappingService.createAlias(
+      const shortUrl = await urlMappingService.createShortUrl(
         url,
         customAlias,
         expiresIn,
       );
-      res.json({ shortUrl: `${process.env.BASE_URL}/${alias}` });
+      res.json({ shortUrl: shortUrl });
     } catch (err) {
       next(err);
     }

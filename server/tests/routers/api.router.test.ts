@@ -8,11 +8,13 @@ import {
 } from "../../src/errors/errors.js";
 import { errorHandler } from "../../src/middlewares/errorHandler.js";
 import { UrlMapping } from "@url-shortener/shared-types";
-import urlMappingService from "../../src/services/urlMappingService.js";
+import urlMappingService, {
+  createShortUrl,
+} from "../../src/services/urlMappingService.js";
 
 vi.mock("../../src/services/urlMappingService.js", () => ({
   default: {
-    createAlias: vi.fn(),
+    createShortUrl: vi.fn(),
     getAll: vi.fn(),
     deleteById: vi.fn(),
   },
@@ -92,7 +94,9 @@ describe("POST /api/urls", () => {
   });
 
   it("should return 200 and shortUrl for valid input", async () => {
-    mockedUrlMappingService.createAlias.mockResolvedValue("abc123");
+    mockedUrlMappingService.createShortUrl.mockResolvedValue(
+      "http://short.ly/myalias",
+    );
 
     const res = await createUrlMapping({
       url: "https://example.com",
@@ -101,8 +105,8 @@ describe("POST /api/urls", () => {
     });
 
     expect(res.status).toBe(200);
-    expect(res.body.shortUrl).toBe(`${process.env.BASE_URL}/abc123`);
-    expect(mockedUrlMappingService.createAlias).toHaveBeenCalledWith(
+    expect(res.body.shortUrl).toBe("http://short.ly/myalias");
+    expect(mockedUrlMappingService.createShortUrl).toHaveBeenCalledWith(
       "https://example.com",
       "myalias",
       "5m",
@@ -110,7 +114,7 @@ describe("POST /api/urls", () => {
   });
 
   it("should return 409 if alias already exists", async () => {
-    mockedUrlMappingService.createAlias.mockRejectedValue(
+    mockedUrlMappingService.createShortUrl.mockRejectedValue(
       new AliasAlreadyExistsError("taken"),
     );
 
