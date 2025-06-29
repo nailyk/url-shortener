@@ -1,24 +1,31 @@
-// urlMappingRepository.test.ts
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import urlMappingRepository from "../../src/repositories/urlMappingRepository.js";
 import { Pool } from "pg";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { UrlMappingDbRepository } from "../../src/repositories/urlMappingDbRepository.js";
 
-// Mock the pg Pool
+// Mock pg Pool
 vi.mock("pg", () => {
   const mClient = { query: vi.fn() };
   return { Pool: vi.fn(() => mClient) };
 });
 
-const mockedPool = new Pool() as unknown as { query: ReturnType<typeof vi.fn> };
+// Cast the mocked Pool's query function so we can configure it
+const mockedPoolInstance = new Pool() as unknown as {
+  query: ReturnType<typeof vi.fn>;
+};
 
-describe("urlMappingRepository", () => {
+// Instantiate the class with the mocked pool
+let urlMappingRepository: UrlMappingDbRepository;
+
+describe("UrlMappingDbRepository", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.BASE_URL = "https://short.ly";
+    urlMappingRepository = new UrlMappingDbRepository(
+      mockedPoolInstance as unknown as Pool,
+    );
   });
 
   afterEach(() => {
-    // Reset any Date.now mock after tests
     vi.restoreAllMocks();
   });
 
@@ -30,19 +37,24 @@ describe("urlMappingRepository", () => {
         alias: "abc",
         expires_at: null,
       };
-      mockedPool.query.mockResolvedValueOnce({ rows: [fakeRow] });
+      mockedPoolInstance.query.mockResolvedValueOnce({ rows: [fakeRow] });
 
       const result = await urlMappingRepository.findByAlias("abc");
 
-      expect(mockedPool.query).toHaveBeenCalledWith(
+      expect(mockedPoolInstance.query).toHaveBeenCalledWith(
         "SELECT * FROM url_mappings WHERE alias = $1 LIMIT 1",
         ["abc"],
       );
-      expect(result).toEqual(fakeRow);
+      expect(result).toEqual({
+        id: 1,
+        originalUrl: "https://example.com",
+        alias: "abc",
+        expiresAt: null,
+      });
     });
 
     it("returns null if not found", async () => {
-      mockedPool.query.mockResolvedValueOnce({ rows: [] });
+      mockedPoolInstance.query.mockResolvedValueOnce({ rows: [] });
 
       const result = await urlMappingRepository.findByAlias("missing");
 
@@ -52,7 +64,7 @@ describe("urlMappingRepository", () => {
 
   describe("doesAliasExist", () => {
     it("returns true if alias exists", async () => {
-      mockedPool.query.mockResolvedValueOnce({ rowCount: 1 });
+      mockedPoolInstance.query.mockResolvedValueOnce({ rowCount: 1 });
 
       const result = await urlMappingRepository.doesAliasExist("abc");
 
@@ -60,7 +72,7 @@ describe("urlMappingRepository", () => {
     });
 
     it("returns false if alias does not exist", async () => {
-      mockedPool.query.mockResolvedValueOnce({ rowCount: 0 });
+      mockedPoolInstance.query.mockResolvedValueOnce({ rowCount: 0 });
 
       const result = await urlMappingRepository.doesAliasExist("missing");
 
@@ -75,7 +87,7 @@ describe("urlMappingRepository", () => {
 
       await urlMappingRepository.save("https://example.com", "abc", 60000);
 
-      expect(mockedPool.query).toHaveBeenCalledWith(
+      expect(mockedPoolInstance.query).toHaveBeenCalledWith(
         "INSERT INTO url_mappings (original_url, alias, expires_at) VALUES ($1, $2, $3)",
         ["https://example.com", "abc", new Date(now + 60000)],
       );
@@ -84,7 +96,7 @@ describe("urlMappingRepository", () => {
     it("inserts a new url mapping without expiration", async () => {
       await urlMappingRepository.save("https://example.com", "abc");
 
-      expect(mockedPool.query).toHaveBeenCalledWith(
+      expect(mockedPoolInstance.query).toHaveBeenCalledWith(
         "INSERT INTO url_mappings (original_url, alias, expires_at) VALUES ($1, $2, $3)",
         ["https://example.com", "abc", null],
       );
@@ -93,7 +105,7 @@ describe("urlMappingRepository", () => {
 
   describe("getAll", () => {
     it("returns all url mappings formatted", async () => {
-      mockedPool.query.mockResolvedValueOnce({
+      mockedPoolInstance.query.mockResolvedValueOnce({
         rows: [
           {
             id: 1,
@@ -116,13 +128,13 @@ describe("urlMappingRepository", () => {
         {
           id: 1,
           originalUrl: "https://example.com",
-          shortUrl: "https://short.ly/abc",
+          alias: "abc",
           expiresAt: new Date("2025-01-01T00:00:00.000Z"),
         },
         {
           id: 2,
           originalUrl: "https://test.com",
-          shortUrl: "https://short.ly/xyz",
+          alias: "xyz",
           expiresAt: null,
         },
       ]);

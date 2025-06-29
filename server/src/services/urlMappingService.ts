@@ -1,25 +1,30 @@
 import ms from "ms";
 import Sqids from "sqids";
-import urlMappingRepository from "../repositories/urlMappingRepository.js";
 import urlMappingCacheRepository from "../repositories/urlMappingCacheRepository.js";
+import urlMappingRepository from "../repositories/urlMappingDbRepository.js";
 
 import {
+  Alias,
+  OriginalUrl,
+  ShortUrl,
+  UrlMapping,
+} from "@url-shortener/shared-types";
+import {
   AliasAlreadyExistsError,
-  AliasIsExpiredError,
   AliasDoesNotExistError,
+  AliasIsExpiredError,
   UrlMappingNotFoundError,
 } from "../errors/errors.js";
-import { Alias, OriginalUrl, UrlMapping } from "@url-shortener/shared-types";
 
 // TODO create service which can be easily unit tested
 
 const SQIDS = new Sqids({ minLength: 6 });
 
-export async function createAlias(
+export async function createShortUrl(
   originalUrl: OriginalUrl,
   customAlias?: Alias,
   expiresIn?: ms.StringValue,
-): Promise<Alias> {
+): Promise<ShortUrl> {
   if (customAlias && (await urlMappingRepository.doesAliasExist(customAlias))) {
     throw new AliasAlreadyExistsError(customAlias);
   }
@@ -29,7 +34,7 @@ export async function createAlias(
 
   await urlMappingRepository.save(originalUrl, alias, expiresInMs);
   await urlMappingCacheRepository
-    .cacheOriginalUrl(originalUrl, alias, expiresInMs)
+    .cacheUrlMapping(originalUrl, alias, expiresInMs)
     .catch((err) => {
       console.error(
         "[Redis] Failed to cache alias:",
@@ -37,7 +42,7 @@ export async function createAlias(
       );
     });
 
-  return alias;
+  return `${process.env.BASE_URL}/${alias}` as ShortUrl;
 }
 
 async function generateAlias(): Promise<Alias> {
@@ -50,35 +55,44 @@ async function resolveOriginalUrl(alias: Alias): Promise<OriginalUrl> {
     await urlMappingCacheRepository.getOriginalUrl(alias);
   if (cachedOriginalUrl) return cachedOriginalUrl;
 
-  const data = await urlMappingRepository.findByAlias(alias);
-  if (!data) throw new AliasDoesNotExistError(alias);
+  const urlMapping = await urlMappingRepository.findByAlias(alias);
+  if (!urlMapping) throw new AliasDoesNotExistError(alias);
 
-  const { originalUrl, expiresAt } = data;
+  const { originalUrl, expiresAt } = urlMapping;
   if (expiresAt && new Date() > new Date(expiresAt))
     throw new AliasIsExpiredError(alias);
 
   const ttl = expiresAt
     ? Math.floor((new Date(expiresAt).getTime() - Date.now()) / 1000)
     : undefined;
-  await urlMappingCacheRepository.cacheOriginalUrl(alias, originalUrl, ttl);
+  await urlMappingCacheRepository.cacheUrlMapping(alias, originalUrl, ttl);
 
   return originalUrl;
 }
 
 async function getAll(): Promise<UrlMapping[]> {
-  return await urlMappingRepository.getAll();
+  return await urlMappingRepository.getAll().then((urlMappings) => {
+    return urlMappings.map(({ id, originalUrl, alias, expiresAt }) => ({
+      id,
+      originalUrl,
+      shortUrl: `${process.env.BASE_URL}/${alias}`,
+      expiresAt: expiresAt,
+    }));
+  });
 }
 
 async function deleteById(id: number): Promise<void> {
-  const deleted = await urlMappingRepository.deleteById(id);
+  const urlMapping = await urlMappingRepository.findById(id);
+  if (!urlMapping) throw new UrlMappingNotFoundError(id);
 
-  if (!deleted) {
-    throw new UrlMappingNotFoundError(id);
-  }
+  await Promise.all([
+    urlMappingRepository.deleteById(id),
+    urlMappingCacheRepository.deleteUrlMapping(urlMapping.alias),
+  ]);
 }
 
 export default {
-  createAlias,
+  createShortUrl,
   resolveOriginalUrl,
   getAll,
   deleteById,

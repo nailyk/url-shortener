@@ -26,11 +26,11 @@ export default function App() {
   const [shortUrl, setShortUrl] = useState("");
   const [error, setError] = useState("");
 
-  const [shortUrls, setShortUrls] = useState<UrlMapping[]>([]);
-  const [loadingUrls, setLoadingUrls] = useState(false);
+  const [urlMappings, setUrlMappings] = useState<UrlMapping[]>([]);
+  const [loadingUrlMappings, setLoadingUrlMappings] = useState(false);
 
-  const fetchShortUrls = async (): Promise<void> => {
-    setLoadingUrls(true);
+  const fetchUrlMappings = async (): Promise<void> => {
+    setLoadingUrlMappings(true);
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/urls`);
       const data: GetAllUrlMappingsResponseBody | ApiErrorResponseBody =
@@ -42,17 +42,17 @@ export default function App() {
         throw new Error(errorText);
       }
 
-      setShortUrls(data as UrlMapping[]);
+      setUrlMappings(data as UrlMapping[]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Network error");
     } finally {
-      setLoadingUrls(false);
+      setLoadingUrlMappings(false);
     }
   };
 
   useEffect(() => {
     if (tab === "list") {
-      fetchShortUrls();
+      fetchUrlMappings();
     } else {
       setShortUrl("");
       setError("");
@@ -112,7 +112,7 @@ export default function App() {
         const data = await res.json();
         throw new Error(data.error || "Failed to delete URL");
       }
-      setShortUrls((urls) => urls.filter((u) => u.id !== id));
+      setUrlMappings((urls) => urls.filter((u) => u.id !== id));
       toast.success("URL mapping deleted!");
     } catch (err) {
       toast.error(
@@ -148,8 +148,8 @@ export default function App() {
 
         {tab === "list" && (
           <UrlList
-            items={shortUrls}
-            loading={loadingUrls}
+            items={urlMappings}
+            loading={loadingUrlMappings}
             onDelete={handleDelete}
           />
         )}
