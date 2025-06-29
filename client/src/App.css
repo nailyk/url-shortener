@@ -1,5 +1,3 @@
-/* Base & layout */
-
 body {
   background: linear-gradient(120deg, #667eea 0%, #5a67d8 100%);
   min-height: 100vh;
@@ -9,8 +7,8 @@ body {
 }
 
 .app-container {
-  max-width: 1100px; /* Was 600px */
-  width: 90vw; /* Responsive width */
+  max-width: 1100px;
+  width: 90vw;
   margin: 4rem auto;
   background: #ffffff;
   border-radius: 24px;
@@ -262,7 +260,7 @@ body {
   border-radius: 8px;
   margin-bottom: 0.5rem;
   box-shadow: inset 0 0 4px rgba(102, 126, 234, 0.06);
-  height: 36px; /* More condensed */
+  height: 36px;
   overflow: hidden;
 }
 
@@ -361,4 +359,93 @@ body {
   .app-url-list {
     grid-template-columns: 1fr;
   }
+}
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(67, 56, 202, 0.18);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: modalFadeIn 0.25s;
+}
+
+/* Modal Box */
+.modal {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.18);
+  padding: 2.2rem 2rem 1.5rem 2rem;
+  min-width: 320px;
+  max-width: 95vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: modalPopIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes modalPopIn {
+  from {
+    opacity: 0;
+    transform: translateY(32px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Modal Title */
+.modal-title {
+  color: #4338ca;
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+
+/* Modal Actions */
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  width: 100%;
+  justify-content: center;
+}
+
+/* Modal Button */
+.modal .app-button {
+  min-width: 110px;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  border-radius: 10px;
+}
+
+/* Modal Close (X) Button */
+.modal-close {
+  position: absolute;
+  top: 1.1rem;
+  right: 1.1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #7c3aed;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.modal-close:hover {
+  color: #e53e3e;
 }

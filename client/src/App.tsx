@@ -1,21 +1,22 @@
-import { useEffect, useState, FormEvent } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
 import "./App.css";
 
 import {
-  GetAllUrlMappingsResponseBody,
-  UrlMapping,
-  CreateUrlMappingSuccessResponseBody,
   ApiErrorResponseBody,
   ApiValidationErrorResponseBody,
+  CreateUrlMappingSuccessResponseBody,
+  GetAllUrlMappingsResponseBody,
+  UrlMapping,
 } from "@url-shortener/shared-types";
 
+import ConfirmationModal from "./components/ConfirmationModal";
+import ErrorMessage from "./components/ErrorMessage";
 import ShortenUrlForm from "./components/ShortenUrlForm";
 import ShortUrlDisplay from "./components/ShortUrlDisplay";
-import UrlList from "./components/UrlList";
-import ErrorMessage from "./components/ErrorMessage";
 import Tabs from "./components/Tabs";
+import UrlList from "./components/UrlList";
 
 export default function App() {
   const [tab, setTab] = useState<"create" | "list">("create");
@@ -25,6 +26,8 @@ export default function App() {
   const [expiresIn, setExpiresIn] = useState("");
   const [shortUrl, setShortUrl] = useState("");
   const [error, setError] = useState("");
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<number | null>(null);
 
   const [urlMappings, setUrlMappings] = useState<UrlMapping[]>([]);
   const [loadingUrlMappings, setLoadingUrlMappings] = useState(false);
@@ -99,31 +102,46 @@ export default function App() {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this URL mapping?")) {
-      return;
-    }
+  const handleDelete = (id: number) => {
+    setPendingDeleteId(id);
+    setShowConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (pendingDeleteId == null) return;
+    setShowConfirm(false);
     setError("");
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/urls/${id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/urls/${pendingDeleteId}`,
+        {
+          method: "DELETE",
+        },
+      );
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || "Failed to delete URL");
       }
-      setUrlMappings((urls) => urls.filter((u) => u.id !== id));
+      setUrlMappings((urls) => urls.filter((u) => u.id !== pendingDeleteId));
       toast.success("URL mapping deleted!");
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Failed to delete URL mapping",
       );
+    } finally {
+      setPendingDeleteId(null);
     }
   };
 
   return (
     <>
       <Toaster position="top-right" />
+      <ConfirmationModal
+        open={showConfirm}
+        message="Are you sure you want to delete this URL mapping?"
+        onConfirm={confirmDelete}
+        onCancel={() => setShowConfirm(false)}
+      />
       <div className="app-container">
         <h1 className="app-title">🔗 URL Shortener</h1>
 

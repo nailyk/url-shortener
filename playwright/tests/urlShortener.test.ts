@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 test.describe("URL Shortener E2E", () => {
   test("should create a short URL and show it", async ({ page }) => {
