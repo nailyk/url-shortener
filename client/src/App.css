@@ -277,7 +277,8 @@ body {
   overflow: hidden;
 }
 
-.url-section .url-link,
+.url-section .url-short-link,
+.url-original-link,
 .url-section .url-short {
   font-size: 0.98rem;
   color: #4c51bf;
@@ -290,7 +291,7 @@ body {
   transition: color 0.22s;
 }
 
-.url-section .url-link:hover,
+.url-section .url-short-link:hover,
 .url-section .url-short:hover {
   color: #6b46c1;
   text-decoration: underline;
@@ -305,7 +306,7 @@ body {
   margin-bottom: 0.1rem;
 }
 
-.url-link {
+.url-short-link {
   font-size: 1.05rem;
   color: #4c51bf;
   font-weight: 600;
@@ -314,7 +315,7 @@ body {
   text-decoration: none;
 }
 
-.url-link:hover {
+.url-short-link:hover {
   color: #6b46c1;
   text-decoration: underline;
 }
@@ -324,6 +325,13 @@ body {
   font-weight: 700;
   color: #5a67d8;
   word-break: break-word;
+}
+
+.url-original-link {
+  color: #64748b;
+}
+.url-original-link:hover {
+  text-decoration: underline;
 }
 
 .url-expiration {
@@ -356,12 +364,6 @@ body {
 .url-card-expired {
   opacity: 0.6;
   filter: grayscale(0.2);
-}
-
-.url-link-expired {
-  text-decoration: line-through;
-  color: #b0b0b0;
-  pointer-events: none;
 }
 
 @media (max-width: 640px) {
