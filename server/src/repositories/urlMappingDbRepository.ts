@@ -63,7 +63,9 @@ export class UrlMappingDbRepository {
   }
 
   async getAll(): Promise<UrlMappingDB[]> {
-    const { rows } = await this.pool.query(`SELECT * FROM url_mappings`);
+    const { rows } = await this.pool.query(
+      `SELECT * FROM url_mappings ORDER BY id DESC`,
+    );
     return rows.map(this.mapRowToUrlMappingDB);
   }
 
