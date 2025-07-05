@@ -10,7 +10,8 @@ export class UrlMappingCacheRepository {
     this.client =
       client ??
       new RedisClient({
-        host: process.env.REDIS_HOST ?? "localhost",
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_PORT,
       });
   }
 
@@ -48,5 +49,4 @@ export class UrlMappingCacheRepository {
   }
 }
 
-const urlMappingCacheRepository = new UrlMappingCacheRepository();
-export default urlMappingCacheRepository;
+export const urlMappingCacheRepository = new UrlMappingCacheRepository();

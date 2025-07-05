@@ -2,18 +2,15 @@ import { Pool } from "pg";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { UrlMappingDbRepository } from "../../src/repositories/urlMappingDbRepository.js";
 
-// Mock pg Pool
 vi.mock("pg", () => {
   const mClient = { query: vi.fn() };
   return { Pool: vi.fn(() => mClient) };
 });
 
-// Cast the mocked Pool's query function so we can configure it
 const mockedPoolInstance = new Pool() as unknown as {
   query: ReturnType<typeof vi.fn>;
 };
 
-// Instantiate the class with the mocked pool
 let urlMappingRepository: UrlMappingDbRepository;
 
 describe("UrlMappingDbRepository", () => {
@@ -129,7 +126,7 @@ describe("UrlMappingDbRepository", () => {
           id: 1,
           originalUrl: "https://example.com",
           alias: "abc",
-          expiresAt: new Date("2025-01-01T00:00:00.000Z"),
+          expiresAt: "2025-01-01T00:00:00.000Z",
         },
         {
           id: 2,

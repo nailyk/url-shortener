@@ -1,30 +1,24 @@
+import { UrlMapping } from "@url-shortener/shared-types";
 import express from "express";
 import request from "supertest";
-import { describe, it, beforeEach, expect, vi } from "vitest";
-import apiRouter from "../../src/routers/api.router.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   AliasAlreadyExistsError,
   UrlMappingNotFoundError,
 } from "../../src/errors/errors.js";
 import { errorHandler } from "../../src/middlewares/errorHandler.js";
-import { UrlMapping } from "@url-shortener/shared-types";
-import urlMappingService, {
-  createShortUrl,
-} from "../../src/services/urlMappingService.js";
+import apiRouter from "../../src/routers/api.router.js";
+import { UrlMappingService } from "../../src/services/urlMappingService.js";
 
-vi.mock("../../src/services/urlMappingService.js", () => ({
-  default: {
-    createShortUrl: vi.fn(),
-    getAll: vi.fn(),
-    deleteById: vi.fn(),
-  },
-}));
-
-const mockedUrlMappingService = vi.mocked(urlMappingService);
+const mockedUrlMappingService: Partial<Record<keyof UrlMappingService, any>> = {
+  createShortUrl: vi.fn(),
+  getAll: vi.fn(),
+  deleteById: vi.fn(),
+};
 
 const app = express();
 app.use(express.json());
-app.use("/api/", apiRouter, errorHandler);
+app.use("/api/", apiRouter(mockedUrlMappingService as any), errorHandler);
 
 const createUrlMapping = (body: object) =>
   request(app).post("/api/urls").send(body);
@@ -184,7 +178,7 @@ describe("DELETE /api/urls/:id", () => {
   });
 
   it("should return 204 when deletion is successful", async () => {
-    mockedUrlMappingService.deleteById.mockResolvedValue();
+    mockedUrlMappingService.deleteById.mockResolvedValue(undefined);
 
     const res = await deleteUrlMapping(123);
     expect(res.status).toBe(204);
