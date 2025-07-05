@@ -4,5 +4,5 @@ export type UrlMappingDB = {
   id: number;
   originalUrl: OriginalUrl;
   alias: Alias;
-  expiresAt: Date | null;
+  expiresAt?: Date;
 };

@@ -1,20 +1,20 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import request from "supertest";
-import { describe, it, beforeEach, expect, vi } from "vitest";
-import redirectUrlRouter from "../../src/routers/redirectUrl.router.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AliasDoesNotExistError } from "../../src/errors/errors.js";
-import urlMappingService from "../../src/services/urlMappingService.js";
-
-vi.mock("../../src/services/urlMappingService.js", () => ({
-  default: {
-    resolveOriginalUrl: vi.fn(),
-  },
-}));
-
-const mockedUrlMappingService = vi.mocked(urlMappingService);
+import redirectUrlRouter from "../../src/routers/redirectUrl.router.js";
+import type { UrlMappingService } from "../../src/services/urlMappingService.js";
 
 const app = express();
-app.use("/", redirectUrlRouter);
+
+const mockedUrlMappingService: Partial<Record<keyof UrlMappingService, any>> = {
+  resolveOriginalUrl: vi.fn(),
+};
+
+app.use(
+  "/",
+  redirectUrlRouter(mockedUrlMappingService as unknown as UrlMappingService),
+);
 app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
   res.status(404).json({ error: err.message });
 });

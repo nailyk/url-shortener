@@ -1,17 +1,21 @@
 import { Router } from "express";
-import urlMappingService from "../services/urlMappingService.js";
+import type { UrlMappingService } from "../services/urlMappingService.js";
 
-const router = Router();
+export default function redirectUrlRouter(
+  urlMappingService: UrlMappingService,
+) {
+  const router = Router();
 
-router.get("/:alias", async (req, res, next) => {
-  try {
-    const originalUrl = await urlMappingService.resolveOriginalUrl(
-      req.params.alias,
-    );
-    res.redirect(originalUrl);
-  } catch (err) {
-    next(err);
-  }
-});
+  router.get("/:alias", async (req, res, next) => {
+    try {
+      const originalUrl = await urlMappingService.resolveOriginalUrl(
+        req.params.alias,
+      );
+      res.redirect(originalUrl);
+    } catch (err) {
+      next(err);
+    }
+  });
 
-export default router;
+  return router;
+}

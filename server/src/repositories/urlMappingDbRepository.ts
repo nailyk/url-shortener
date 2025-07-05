@@ -10,7 +10,7 @@ export class UrlMappingDbRepository {
       pool ??
       new Pool({
         host: process.env.PGHOST,
-        port: Number(process.env.PGPORT) || 5432,
+        port: process.env.PGPORT,
         user: process.env.PGUSER,
         password: process.env.PGPASSWORD,
         database: process.env.PGDATABASE,
@@ -22,7 +22,7 @@ export class UrlMappingDbRepository {
       id: row.id,
       originalUrl: row.original_url,
       alias: row.alias,
-      expiresAt: row.expires_at ? new Date(row.expires_at) : null,
+      expiresAt: row.expires_at,
     };
   }
 
@@ -76,6 +76,4 @@ export class UrlMappingDbRepository {
   }
 }
 
-// Optionally export a default instance
-const urlMappingDbRepository = new UrlMappingDbRepository();
-export default urlMappingDbRepository;
+export const urlMappingDbRepository = new UrlMappingDbRepository();
