@@ -17,7 +17,7 @@
   "devDependencies": {
     "@import-meta-env/typescript": "^0.4.0",
     "@vitejs/plugin-react": "^4.6.0",
-    "vite": "^7.0.2",
+    "vite": "^7.0.3",
     "vitest": "^3.2.3"
   },
   "author": "nailyk"
