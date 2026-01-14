@@ -11,6 +11,8 @@ declare global {
       PGDATABASE: string;
       REDIS_HOST: string;
       REDIS_PORT: number;
+      BLOOM_FILTER_EXPECTED_ITEMS: number;
+      BLOOM_FILTER_FALSE_POSITIVE_RATE: number;
     }
   }
 }

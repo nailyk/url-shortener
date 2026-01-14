@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, Page, test } from "@playwright/test";
 
 /**
  * Generates a random alias for testing.
@@ -13,7 +13,7 @@ function generateRandomAlias(length = 8): string {
  * Helper to create a short URL and return its alias.
  */
 async function createShortUrl(
-  page,
+  page: Page,
   url = "https://openai.com",
 ): Promise<string> {
   const customAlias = generateRandomAlias();
@@ -85,5 +85,23 @@ test.describe("URL Shortener E2E", () => {
 
     // Verify the card is deleted
     await expect(cards.filter({ hasText: customAlias })).toHaveCount(0);
+  });
+
+  test("should block malicious URLs", async ({ page }) => {
+    await page.goto("/");
+
+    const maliciousUrl = "http://malicious-site.com/evil";
+    await page.click('button:has-text("Shorten URL")');
+    await page.fill('input[name="url"]', maliciousUrl);
+    await page.click('button[type="submit"]');
+
+    // Verify error message is shown
+    const errorMessage = page.locator(".app-error");
+    await expect(errorMessage).toBeVisible();
+    await expect(errorMessage).toHaveText(/malicious/i);
+
+    // Verify no short URL is created
+    const shortUrlLink = page.locator("#shortUrl");
+    await expect(shortUrlLink).not.toBeVisible();
   });
 });

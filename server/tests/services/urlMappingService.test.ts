@@ -4,16 +4,19 @@ import {
   AliasAlreadyExistsError,
   AliasDoesNotExistError,
   AliasIsExpiredError,
+  MaliciousUrlError,
   UrlMappingNotFoundError,
 } from "../../src/errors/errors.js";
 import { UrlMappingCacheRepository } from "../../src/repositories/urlMappingCacheRepository.js";
 import { UrlMappingDbRepository } from "../../src/repositories/urlMappingDbRepository.js";
+import { MaliciousDomainService } from "../../src/services/maliciousDomainService.js";
 import { UrlMappingService } from "../../src/services/urlMappingService.js";
 
 describe("UrlMappingService", () => {
   let service: UrlMappingService;
   let mockDbRepo: Partial<UrlMappingDbRepository>;
   let mockCacheRepo: Partial<UrlMappingCacheRepository>;
+  let mockMaliciousDomainService: Partial<MaliciousDomainService>;
   const baseUrl = "https://short.url";
 
   beforeEach(() => {
@@ -33,9 +36,15 @@ describe("UrlMappingService", () => {
       deleteUrlMapping: vi.fn(),
     };
 
+    mockMaliciousDomainService = {
+      isMalicious: vi.fn().mockResolvedValue(false),
+      add: vi.fn(),
+    };
+
     service = new UrlMappingService(
       mockDbRepo as UrlMappingDbRepository,
       mockCacheRepo as UrlMappingCacheRepository,
+      mockMaliciousDomainService as MaliciousDomainService,
       baseUrl,
     );
   });
@@ -80,6 +89,15 @@ describe("UrlMappingService", () => {
       await expect(
         service.createShortUrl(originalUrl, customAlias),
       ).rejects.toThrow(AliasAlreadyExistsError);
+    });
+
+    it("should throw error if url is malicious", async () => {
+      const originalUrl = "https://evil.com/bad" as OriginalUrl;
+      (mockMaliciousDomainService.isMalicious as Mock).mockResolvedValue(true);
+
+      await expect(service.createShortUrl(originalUrl)).rejects.toThrow(
+        MaliciousUrlError,
+      );
     });
 
     it("should handle Redis cache errors gracefully", async () => {

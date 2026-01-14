@@ -10,15 +10,18 @@ import {
   AliasAlreadyExistsError,
   AliasDoesNotExistError,
   AliasIsExpiredError,
+  MaliciousUrlError,
   UrlMappingNotFoundError,
 } from "../errors/errors.js";
 import { UrlMappingCacheRepository } from "../repositories/urlMappingCacheRepository.js";
 import { UrlMappingDbRepository } from "../repositories/urlMappingDbRepository.js";
+import { MaliciousDomainService } from "./maliciousDomainService.js";
 
 export class UrlMappingService {
   constructor(
     private readonly urlMappingDbRepository: UrlMappingDbRepository,
     private readonly urlMappingCacheRepository: UrlMappingCacheRepository,
+    private readonly maliciousDomainService: MaliciousDomainService,
     private readonly baseUrl: string,
     private readonly sqids: Sqids = new Sqids({ minLength: 6 }),
   ) {}
@@ -28,6 +31,13 @@ export class UrlMappingService {
     customAlias?: Alias,
     expiresIn?: ms.StringValue,
   ): Promise<ShortUrl> {
+    const url = new URL(originalUrl);
+    const domain = url.hostname;
+
+    if (await this.maliciousDomainService.isMalicious(domain)) {
+      throw new MaliciousUrlError(domain);
+    }
+
     if (customAlias) {
       await this.validateAliasDoesNotExist(customAlias);
     }

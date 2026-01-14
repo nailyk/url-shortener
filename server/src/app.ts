@@ -5,6 +5,7 @@ import { urlMappingDbRepository } from "./repositories/urlMappingDbRepository.js
 
 import apiRouter from "./routers/api.router.js";
 import redirectUrlRouter from "./routers/redirectUrl.router.js";
+import { maliciousDomainService } from "./services/maliciousDomainService.js";
 import { UrlMappingService } from "./services/urlMappingService.js";
 
 import { loadEnv } from "./loadEnv.js";
@@ -17,6 +18,7 @@ const app = express();
 const urlMappingService = new UrlMappingService(
   urlMappingDbRepository,
   urlMappingCacheRepository,
+  maliciousDomainService,
   process.env.BASE_URL,
 );
 
