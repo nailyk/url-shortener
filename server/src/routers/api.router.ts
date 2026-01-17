@@ -4,7 +4,7 @@ import {
   DeleteUrlMappingResponseBody,
   GetAllUrlMappingsResponseBody,
 } from "@url-shortener/shared-types";
-import express, { NextFunction, Request, Response, Router } from "express";
+import express, { Request, Response, Router } from "express";
 import {
   createUrlMappingValidators,
   deleteUrlMappingValidators,
@@ -23,35 +23,22 @@ export default function apiRouter(urlMappingService: UrlMappingService) {
     async (
       req: Request<{}, any, CreateUrlMappingRequestBody>,
       res: Response<CreateUrlMappingResponseBody>,
-      next: NextFunction,
     ) => {
       const { url, customAlias, expiresIn } = req.body;
-      try {
-        const shortUrl = await urlMappingService.createShortUrl(
-          url,
-          customAlias,
-          expiresIn,
-        );
-        res.json({ shortUrl: shortUrl });
-      } catch (err) {
-        next(err);
-      }
+      const shortUrl = await urlMappingService.createShortUrl(
+        url,
+        customAlias,
+        expiresIn,
+      );
+      res.json({ shortUrl: shortUrl });
     },
   );
 
   router.get(
     "/urls",
-    async (
-      _,
-      res: Response<GetAllUrlMappingsResponseBody>,
-      next: NextFunction,
-    ) => {
-      try {
-        const result = await urlMappingService.getAll();
-        res.json(result);
-      } catch (err) {
-        next(err);
-      }
+    async (_, res: Response<GetAllUrlMappingsResponseBody>) => {
+      const result = await urlMappingService.getAll();
+      res.json(result);
     },
   );
 
@@ -62,15 +49,10 @@ export default function apiRouter(urlMappingService: UrlMappingService) {
     async (
       req: Request<{ id: string }>,
       res: Response<DeleteUrlMappingResponseBody>,
-      next: NextFunction,
     ) => {
       const id = Number(req.params.id);
-      try {
-        await urlMappingService.deleteById(id);
-        res.sendStatus(204);
-      } catch (err) {
-        next(err);
-      }
+      await urlMappingService.deleteById(id);
+      res.sendStatus(204);
     },
   );
 

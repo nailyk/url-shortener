@@ -9,6 +9,10 @@ export function loadEnv() {
   if (fs.existsSync(envPath)) {
     dotenv.config({ path: envPath });
   } else {
-    console.warn(`[env] File ${envPath} not found.`);
+    // If not found, we assume env vars are provided by the environment (e.g. Docker)
+    // console.warn(`[env] File ${envPath} not found.`);
   }
 }
+
+// Auto-execute on import
+loadEnv();

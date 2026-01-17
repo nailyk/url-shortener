@@ -1,20 +1,13 @@
 import { Alias, OriginalUrl } from "@url-shortener/shared-types";
 import { Pool } from "pg";
 import { UrlMappingDB } from "../models/dbTypes.js";
+import { pool as sharedPool } from "./pool.js";
 
 export class UrlMappingDbRepository {
   private pool: Pool;
 
   constructor(pool?: Pool) {
-    this.pool =
-      pool ??
-      new Pool({
-        host: process.env.PGHOST,
-        port: process.env.PGPORT,
-        user: process.env.PGUSER,
-        password: process.env.PGPASSWORD,
-        database: process.env.PGDATABASE,
-      });
+    this.pool = pool ?? sharedPool;
   }
 
   private mapRowToUrlMappingDB(row: any): UrlMappingDB {

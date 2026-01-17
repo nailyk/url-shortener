@@ -6,15 +6,11 @@ export default function redirectUrlRouter(
 ) {
   const router = Router();
 
-  router.get("/:alias", async (req, res, next) => {
-    try {
-      const originalUrl = await urlMappingService.resolveOriginalUrl(
-        req.params.alias,
-      );
-      res.redirect(originalUrl);
-    } catch (err) {
-      next(err);
-    }
+  router.get("/:alias", async (req, res) => {
+    const originalUrl = await urlMappingService.resolveOriginalUrl(
+      req.params.alias,
+    );
+    res.redirect(originalUrl);
   });
 
   return router;
