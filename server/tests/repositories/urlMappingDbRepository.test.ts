@@ -3,7 +3,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { UrlMappingDbRepository } from "../../src/repositories/urlMappingDbRepository.js";
 
 vi.mock("pg", () => {
-  const mClient = { query: vi.fn() };
+  const mClient = {
+    query: vi.fn(),
+    on: vi.fn(),
+  };
   return { Pool: vi.fn(() => mClient) };
 });
 
