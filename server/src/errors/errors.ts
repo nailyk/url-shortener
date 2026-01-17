@@ -37,3 +37,13 @@ export class UrlMappingNotFoundError extends CustomError {
     );
   }
 }
+
+export class MaliciousUrlError extends CustomError {
+  constructor(domain: string) {
+    super(
+      "MaliciousUrlError",
+      `The domain "${domain}" is flagged as malicious and cannot be shortened.`,
+      400,
+    );
+  }
+}
