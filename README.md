@@ -16,40 +16,6 @@ Supports custom aliases + expiration time
 
 ---
 
-### Malicious Domain Protection
-
-Uses a Bloom filter to quickly check URLs against known malicious domains before shortening.
-
-**How it works:**
-
-1. URL submitted → extract domain
-2. Check Bloom filter (in-memory, <1μs)
-   - Not in filter → safe, proceed
-   - In filter → verify against database
-3. Block if confirmed malicious, otherwise allow
-
-```
-URL submitted
-     ↓
-Extract domain
-     ↓
-Bloom filter check
-     ↓
-  ┌──┴──┐
-  ↓     ↓
- NO    YES (rare, ~1%)
-  ↓     ↓
-Allow  DB verify ← only DB call
-(99%)   ↓
-     ┌──┴──┐
-     ↓     ↓
-  Malicious Safe
-     ↓     ↓
-   Block  Allow
-```
-
----
-
 ![App Demo](./resources/app-demo.gif)
 
 ## Project Structure
