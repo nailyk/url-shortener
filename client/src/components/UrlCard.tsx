@@ -33,7 +33,7 @@ export default function UrlCard({ item, onDelete }: UrlCardProps) {
           href={item.shortUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className={`url-link url-short${isExpired ? " url-link-expired" : ""}`}
+          className="url-short-link"
           tabIndex={isExpired ? -1 : 0}
           aria-disabled={isExpired}
         >
@@ -47,7 +47,7 @@ export default function UrlCard({ item, onDelete }: UrlCardProps) {
           href={item.originalUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className={`url-link${isExpired ? " url-link-expired" : ""}`}
+          className="url-original-link"
           tabIndex={isExpired ? -1 : 0}
           aria-disabled={isExpired}
         >
@@ -65,7 +65,7 @@ export default function UrlCard({ item, onDelete }: UrlCardProps) {
             </>
           ) : (
             <>
-              <span className="url-label">Expires</span>
+              <span className="url-label">Expires at</span>
               <span className="url-expiration">
                 {new Date(item.expiresAt).toLocaleString()}
               </span>

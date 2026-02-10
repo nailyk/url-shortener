@@ -7,10 +7,10 @@ export const createUrlMappingValidators = checkSchema({
     exists: {
       errorMessage: "url field is required",
     },
+    trim: true,
     isURL: {
       errorMessage: "Invalid URL",
     },
-    trim: true,
   },
 
   customAlias: {
