@@ -1,18 +1,11 @@
 import { Pool } from "pg";
+import { pool as sharedPool } from "./pool.js";
 
 export class MaliciousDomainRepository {
   private pool: Pool;
 
   constructor(pool?: Pool) {
-    this.pool =
-      pool ??
-      new Pool({
-        host: process.env.PGHOST,
-        port: process.env.PGPORT,
-        user: process.env.PGUSER,
-        password: process.env.PGPASSWORD,
-        database: process.env.PGDATABASE,
-      });
+    this.pool = pool ?? sharedPool;
   }
 
   async getAllDomains(): Promise<string[]> {

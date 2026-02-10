@@ -7,6 +7,7 @@ const mockRedisClient = {
   setex: vi.fn(),
   incr: vi.fn(),
   del: vi.fn(),
+  on: vi.fn(),
 };
 
 describe("UrlMappingCacheRepository", () => {

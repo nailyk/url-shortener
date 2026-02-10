@@ -1,5 +1,6 @@
 import { Alias, OriginalUrl } from "@url-shortener/shared-types";
 import { Redis as RedisClient } from "ioredis";
+import { redis as sharedRedis } from "./redis.js";
 
 export class UrlMappingCacheRepository {
   private client: RedisClient;
@@ -7,12 +8,7 @@ export class UrlMappingCacheRepository {
   private readonly COUNTER_KEY = `${this.KEY_PREFIX}:counter`;
 
   constructor(client?: RedisClient) {
-    this.client =
-      client ??
-      new RedisClient({
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT,
-      });
+    this.client = client ?? sharedRedis;
   }
 
   private getKey(alias: Alias): string {
